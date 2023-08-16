@@ -11,3 +11,8 @@ cd fastats
 go build -o fastats
 ```
 
+### Usage
+
+```
+fastats <infile>
+```
