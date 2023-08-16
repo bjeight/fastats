@@ -2,7 +2,8 @@
 
 Very simple statistics from fasta files
 
-### Installation
+
+### Installation
 
 ```
 git clone https://github.com/bjeight/fastats.git
