@@ -14,5 +14,5 @@ go build -o fastats
 ### Usage
 
 ```
-fastats <infile>
+fastats [command] <infile>
 ```

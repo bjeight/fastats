@@ -1,132 +1,105 @@
 package main
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
-	"io"
 	"os"
-	"strings"
 
-	"github.com/virus-evolution/gofasta/pkg/encoding"
-	"github.com/virus-evolution/gofasta/pkg/fastaio"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	infile := os.Args[1]
-	f, err := os.Open(infile)
-	if err != nil {
-		panic(err)
+var (
+	rootCmd = &cobra.Command{
+		Use:               "fastats",
+		Short:             "Very simple statistics from fasta files",
+		Long:              ``,
+		Version:           "0.1.0",
+		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
+)
 
-	c_fasta := make(chan fastaio.EncodedFastaRecord)
-	c_err := make(chan error)
-	c_done := make(chan bool)
-
-	go ReadEncodeFasta(f, false, c_fasta, c_err, c_done)
-
-	go func() {
-		<-c_done
-		close(c_fasta)
-	}()
-
-	for record := range c_fasta {
-		var lookup [256]int
-		for _, nuc := range record.Seq {
-			lookup[nuc] += 1
-		}
-		total := 0
-		for _, v := range lookup {
-			total += v
-		}
-		atgc_total := lookup[136] + lookup[72] + lookup[40] + lookup[24]
-		prop := float64(atgc_total) / float64(total)
-		fmt.Printf("%s proportion ATGC: %f\n", record.ID, prop)
+func Execute() {
+	err := rootCmd.Execute()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 
-func ReadEncodeFasta(f io.Reader, hardGaps bool, chnl chan fastaio.EncodedFastaRecord, cErr chan error, cDone chan bool) {
+func main() {
+	Execute()
+}
 
-	var err error
+func init() {
+	rootCmd.AddCommand(atCmd)
+	rootCmd.AddCommand(gcCmd)
+	rootCmd.AddCommand(atgcCmd)
+	rootCmd.AddCommand(nCmd)
+	rootCmd.AddCommand(gapCmd)
+	rootCmd.AddCommand(lenCmd)
+}
 
-	var coding [256]byte
-	switch hardGaps {
-	case true:
-		coding = encoding.MakeEncodingArrayHardGaps()
-	case false:
-		coding = encoding.MakeEncodingArray()
-	}
+var atCmd = &cobra.Command{
+	Use:                   "at <infile>",
+	Args:                  cobra.ExactArgs(1),
+	Short:                 "AT content",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = at(args[0])
+		return err
+	},
+}
 
-	s := bufio.NewScanner(f)
-	s.Buffer(make([]byte, 0), 1024*1024)
+var gcCmd = &cobra.Command{
+	Use:                   "gc <infile>",
+	Args:                  cobra.ExactArgs(1),
+	Short:                 "GC content",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := gc(args[0])
+		return err
+	},
+}
 
-	first := true
+var atgcCmd = &cobra.Command{
+	Use:                   "atgc <infile>",
+	Args:                  cobra.ExactArgs(1),
+	Short:                 "ATGC content",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := atgc(args[0])
+		return err
+	},
+}
 
-	var id string
-	var description string
-	var seqBuffer []byte
-	var line []byte
-	var nuc byte
+var nCmd = &cobra.Command{
+	Use:                   "n <infile>",
+	Args:                  cobra.ExactArgs(1),
+	Short:                 "N content",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := n(args[0])
+		return err
+	},
+}
 
-	var fr fastaio.EncodedFastaRecord
+var gapCmd = &cobra.Command{
+	Use:                   "gaps <infile>",
+	Args:                  cobra.ExactArgs(1),
+	Short:                 "Gap content",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := gap(args[0])
+		return err
+	},
+}
 
-	counter := 0
-
-	for s.Scan() {
-		line = s.Bytes()
-
-		if first {
-
-			if len(line) == 0 || line[0] != '>' {
-				cErr <- errors.New("badly formatted fasta file")
-				return
-			}
-
-			description = string(line[1:])
-			id = strings.Fields(description)[0]
-
-			first = false
-
-		} else if line[0] == '>' {
-
-			fr = fastaio.EncodedFastaRecord{ID: id, Description: description, Seq: seqBuffer, Idx: counter}
-			chnl <- fr
-			counter++
-
-			description = string(line[1:])
-			id = strings.Fields(description)[0]
-			seqBuffer = make([]byte, 0)
-
-		} else {
-			encodedLine := make([]byte, len(line))
-			for i := range line {
-				nuc = coding[line[i]]
-				if nuc == 0 {
-					cErr <- fmt.Errorf("invalid nucleotide in fasta file (\"%s\")", string(line[i]))
-					return
-				}
-				encodedLine[i] = nuc
-			}
-			seqBuffer = append(seqBuffer, encodedLine...)
-		}
-	}
-
-	if len(seqBuffer) > 0 {
-		fr = fastaio.EncodedFastaRecord{ID: id, Description: description, Seq: seqBuffer, Idx: counter}
-		chnl <- fr
-		counter++
-	}
-
-	if counter == 0 {
-		cErr <- errors.New("empty fasta file")
-		return
-	}
-
-	err = s.Err()
-	if err != nil {
-		cErr <- err
-		return
-	}
-
-	cDone <- true
+var lenCmd = &cobra.Command{
+	Use:                   "len <infile>",
+	Args:                  cobra.ExactArgs(1),
+	Short:                 "Sequence length",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := length(args[0])
+		return err
+	},
 }
