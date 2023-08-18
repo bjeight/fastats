@@ -35,7 +35,7 @@ var c bool
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", true, "calculate statists per file (default is per record)")
-	rootCmd.PersistentFlags().BoolVarP(&c, "count", "c", false, "print counts, not proportions")
+	rootCmd.PersistentFlags().BoolVarP(&c, "count", "c", false, "print counts (default is proportions)")
 
 	rootCmd.PersistentFlags().Lookup("file").NoOptDefVal = "false"
 	rootCmd.PersistentFlags().Lookup("file").DefValue = "false"
@@ -130,7 +130,7 @@ var softCmd = &cobra.Command{
 
 var patternCmd = &cobra.Command{
 	Use: "pattern -p PATTERN <infile>",
-	Long: `e.g. pattern -p AG <infile>
+	Long: `e.g. fastats pattern -p AG <infile>
 `,
 	Args:                  cobra.ExactArgs(1),
 	Short:                 "PATTERN content",
