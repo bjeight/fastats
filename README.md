@@ -14,7 +14,10 @@ go build -o fastats
 ### Usage
 
 ```
-fastats [command] <infile>
+Very simple statistics from fasta files
+
+Usage:
+  fastats [command]
 
 Available Commands:
   at          AT content
@@ -24,5 +27,14 @@ Available Commands:
   help        Help about any command
   len         Sequence length
   n           N content
+  pattern     PATTERN content
   soft        Softmasked content
+
+Flags:
+  -c, --count          print counts, not proportions
+  -f, --file[=false]   calculate statists per file (default is per record)
+  -h, --help           help for fastats
+  -v, --version        version for fastats
+
+Use "fastats [command] --help" for more information about a command.
 ```
