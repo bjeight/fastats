@@ -9,7 +9,7 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:               "fastats",
+		Use:               "fastats [command] <infiles>",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
 		Version:           "0.1.0",
@@ -29,7 +29,17 @@ func main() {
 	Execute()
 }
 
+var p string
+var f bool
+var c bool
+
 func init() {
+	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", true, "calculate statists per file (default is per record)")
+	rootCmd.PersistentFlags().BoolVarP(&c, "count", "c", false, "print counts, not proportions")
+
+	rootCmd.PersistentFlags().Lookup("file").NoOptDefVal = "false"
+	rootCmd.PersistentFlags().Lookup("file").DefValue = "false"
+
 	rootCmd.AddCommand(atCmd)
 	rootCmd.AddCommand(gcCmd)
 	rootCmd.AddCommand(atgcCmd)
@@ -37,6 +47,8 @@ func init() {
 	rootCmd.AddCommand(gapCmd)
 	rootCmd.AddCommand(lenCmd)
 	rootCmd.AddCommand(softCmd)
+	rootCmd.AddCommand(patternCmd)
+	patternCmd.Flags().StringVarP(&p, "pattern", "p", "", "arbitrary pattern to parse")
 }
 
 var atCmd = &cobra.Command{
@@ -45,7 +57,7 @@ var atCmd = &cobra.Command{
 	Short:                 "AT content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = at(args[0])
+		err = pattern(args[0], "ATat", f, c)
 		return err
 	},
 }
@@ -56,7 +68,7 @@ var gcCmd = &cobra.Command{
 	Short:                 "GC content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := gc(args[0])
+		err := pattern(args[0], "GCgc", f, c)
 		return err
 	},
 }
@@ -67,7 +79,7 @@ var atgcCmd = &cobra.Command{
 	Short:                 "ATGC content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := atgc(args[0])
+		err := pattern(args[0], "ATGCatgc", f, c)
 		return err
 	},
 }
@@ -78,7 +90,7 @@ var nCmd = &cobra.Command{
 	Short:                 "N content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := n(args[0])
+		err := pattern(args[0], "Nn", f, c)
 		return err
 	},
 }
@@ -89,7 +101,7 @@ var gapCmd = &cobra.Command{
 	Short:                 "Gap content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := gap(args[0])
+		err := pattern(args[0], "-", f, c)
 		return err
 	},
 }
@@ -100,7 +112,7 @@ var lenCmd = &cobra.Command{
 	Short:                 "Sequence length",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := length(args[0])
+		err := length(args[0], f, c)
 		return err
 	},
 }
@@ -111,7 +123,20 @@ var softCmd = &cobra.Command{
 	Short:                 "Softmasked content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := soft(args[0])
+		err := pattern(args[0], "atgcn", f, c)
+		return err
+	},
+}
+
+var patternCmd = &cobra.Command{
+	Use: "pattern -p PATTERN <infile>",
+	Long: `e.g. pattern -p AG <infile>
+`,
+	Args:                  cobra.ExactArgs(1),
+	Short:                 "PATTERN content",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := pattern(args[0], p, f, c)
 		return err
 	},
 }
