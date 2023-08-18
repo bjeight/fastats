@@ -36,6 +36,7 @@ func init() {
 	rootCmd.AddCommand(nCmd)
 	rootCmd.AddCommand(gapCmd)
 	rootCmd.AddCommand(lenCmd)
+	rootCmd.AddCommand(softCmd)
 }
 
 var atCmd = &cobra.Command{
@@ -100,6 +101,17 @@ var lenCmd = &cobra.Command{
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := length(args[0])
+		return err
+	},
+}
+
+var softCmd = &cobra.Command{
+	Use:                   "soft <infile>",
+	Args:                  cobra.ExactArgs(1),
+	Short:                 "Softmasked",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := soft(args[0])
 		return err
 	},
 }
