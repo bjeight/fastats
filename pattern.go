@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func pattern(infile, pattern string, records bool, counts bool) error {
+func pattern(infile, pattern string, file bool, counts bool) error {
 
 	ba := parsePattern(pattern)
 
@@ -45,27 +45,26 @@ func pattern(infile, pattern string, records bool, counts bool) error {
 			n += lookup[b]
 		}
 
-		if records {
+		if file {
+			n_total += n
+			d_total += len(record.Seq)
+		} else {
 			if counts {
 				fmt.Printf("%s\t%d\n", record.ID, n)
 			} else {
 				stat := float64(n) / float64(len(record.Seq))
 				fmt.Printf("%s\t%f\n", record.ID, stat)
 			}
-		} else {
-			n_total += n
-			d_total += len(record.Seq)
 		}
 	}
 
-	if !records {
+	if file {
 		if counts {
 			fmt.Printf("%s\t%d\n", parseInfile(infile), n_total)
 		} else {
 			stat := float64(n_total) / float64(d_total)
 			fmt.Printf("%s\t%f\n", parseInfile(infile), stat)
 		}
-
 	}
 
 	return nil

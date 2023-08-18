@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func length(infile string, records bool, counts bool) error {
+func length(infile string, file bool, counts bool) error {
 	f, err := os.Open(infile)
 	if err != nil {
 		return (err)
@@ -27,14 +27,14 @@ func length(infile string, records bool, counts bool) error {
 		if err != nil {
 			return (err)
 		}
-		if records {
-			fmt.Printf("%s\t%d\n", record.ID, len(record.Seq))
-		} else {
+		if file {
 			l_total += len(record.Seq)
+		} else {
+			fmt.Printf("%s\t%d\n", record.ID, len(record.Seq))
 		}
 	}
 
-	if !records {
+	if file {
 		fmt.Printf("%s\t%d\n", parseInfile(infile), l_total)
 	}
 

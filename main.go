@@ -34,11 +34,11 @@ var f bool
 var c bool
 
 func init() {
-	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", true, "calculate statists per file (default is per record)")
+	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
 	rootCmd.PersistentFlags().BoolVarP(&c, "count", "c", false, "print counts (default is proportions)")
 
-	rootCmd.PersistentFlags().Lookup("file").NoOptDefVal = "false"
-	rootCmd.PersistentFlags().Lookup("file").DefValue = "false"
+	rootCmd.PersistentFlags().Lookup("file").NoOptDefVal = "true"
+	rootCmd.PersistentFlags().Lookup("count").NoOptDefVal = "true"
 
 	rootCmd.AddCommand(atCmd)
 	rootCmd.AddCommand(gcCmd)
