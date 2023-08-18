@@ -108,7 +108,7 @@ var lenCmd = &cobra.Command{
 var softCmd = &cobra.Command{
 	Use:                   "soft <infile>",
 	Args:                  cobra.ExactArgs(1),
-	Short:                 "Softmasked",
+	Short:                 "Softmasked content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := soft(args[0])
