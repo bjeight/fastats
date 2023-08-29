@@ -5,7 +5,7 @@ Very simple statistics from fasta files
 
 ### Installation
 
-First, [Install go](https://go.dev/dl/),
+First, [install go](https://go.dev/dl/),
 
 then:
 
