@@ -47,7 +47,7 @@ Pf3D7_MIT_v3	0.684096
 record	atgcn_prop
 Pad.softmasked.fasta	0.612057
 Pbi.softmasked.fasta	0.545409
-Pbl.softmasked..fasta	0.576649
+Pbl.softmasked.fasta	0.576649
 Pfa.softmasked.fasta	0.519676
 Pga.softmasked.fasta	0.610234
 Ppr.softmasked.fasta	0.539591
