@@ -6,36 +6,40 @@ import (
 	"os"
 )
 
-func length(infile string, file bool, counts bool) error {
-	f, err := os.Open(infile)
-	if err != nil {
-		return (err)
-	}
-	defer f.Close()
-
-	r := NewReader(f)
+func length(infiles []string, file bool, counts bool) error {
 
 	fmt.Println("record\tlength")
 
-	l_total := 0
+	for _, infile := range infiles {
 
-	for {
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		}
+		f, err := os.Open(infile)
 		if err != nil {
 			return (err)
 		}
-		if file {
-			l_total += len(record.Seq)
-		} else {
-			fmt.Printf("%s\t%d\n", record.ID, len(record.Seq))
-		}
-	}
+		defer f.Close()
 
-	if file {
-		fmt.Printf("%s\t%d\n", parseInfile(infile), l_total)
+		r := NewReader(f)
+
+		l_total := 0
+
+		for {
+			record, err := r.Read()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return (err)
+			}
+			if file {
+				l_total += len(record.Seq)
+			} else {
+				fmt.Printf("%s\t%d\n", record.ID, len(record.Seq))
+			}
+		}
+
+		if file {
+			fmt.Printf("%s\t%d\n", parseInfile(infile), l_total)
+		}
 	}
 
 	return nil
