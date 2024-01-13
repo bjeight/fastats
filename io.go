@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"errors"
 	"io"
 )
@@ -15,7 +16,7 @@ type FastaRecord struct {
 }
 
 var (
-	errBadlyFormedFasta = errors.New("Badly formed Fasta")
+	errBadlyFormedFasta = errors.New("badly formed fasta")
 )
 
 type Reader struct {
@@ -24,6 +25,11 @@ type Reader struct {
 
 func NewReader(f io.Reader) *Reader {
 	return &Reader{r: bufio.NewReader(f)}
+}
+
+func NewZReader(f io.Reader) *Reader {
+	rz, _ := gzip.NewReader(f)
+	return &Reader{r: bufio.NewReader(rz)}
 }
 
 // Read reads one fasta record from the underlying reader. The final record is returned with error = nil,
@@ -40,9 +46,7 @@ func (r *Reader) Read() (FastaRecord, error) {
 	first := true
 
 	for {
-
 		if first {
-
 			// "ReadBytes reads until the first occurrence of delim in the input,
 			// returning a slice containing the data up to and including the delimiter.
 			// If ReadBytes encounters an error before finding a delimiter,
@@ -81,7 +85,6 @@ func (r *Reader) Read() (FastaRecord, error) {
 			first = false
 
 		} else {
-
 			// peek at the first next byte of the underlying reader, in order
 			// to see if we've reached the end of this record (or the file)
 			peek, err = r.r.Peek(1)
@@ -117,7 +120,6 @@ func (r *Reader) Read() (FastaRecord, error) {
 			buffer = append(buffer, line...)
 		}
 	}
-
 	FR.Seq = buffer
 
 	return FR, err

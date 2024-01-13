@@ -9,7 +9,7 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:               "fastats [command] <infile[s]>",
+		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
 		Version:           "0.1.0",
@@ -122,7 +122,7 @@ var patternCmd = &cobra.Command{
 	Use: "pattern -p PATTERN <infile>",
 	Long: `e.g. fastats pattern -p AG <infile[s]>
 `,
-	Short:                 "PATTERN content",
+	Short:                 "Arbitrary PATTERN content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := pattern(args, p, f, c)
