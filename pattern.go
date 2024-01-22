@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -25,7 +26,13 @@ func pattern(infiles []string, pattern string, file bool, counts bool) error {
 		}
 		defer f.Close()
 
-		r := NewReader(f)
+		var r *Reader
+		switch filepath.Ext(infile) {
+		case ".gz", ".bgz":
+			r = NewZReader(f)
+		default:
+			r = NewReader(f)
+		}
 
 		n_total := 0
 		d_total := 0
