@@ -71,7 +71,8 @@ Available Commands:
   help        Help about any command
   len         Sequence length
   n           N content
-  pattern     PATTERN content
+  num         Number of records
+  pattern     Arbitrary PATTERN content
   soft        Softmasked content
 
 Flags:
