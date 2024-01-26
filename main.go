@@ -44,6 +44,7 @@ func init() {
 	rootCmd.AddCommand(lenCmd)
 	rootCmd.AddCommand(softCmd)
 	rootCmd.AddCommand(patternCmd)
+	rootCmd.AddCommand(numCmd)
 
 	patternCmd.Flags().StringVarP(&p, "pattern", "p", "", "arbitrary pattern to parse")
 }
@@ -126,6 +127,16 @@ var patternCmd = &cobra.Command{
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := pattern(args, p, f, c)
+		return err
+	},
+}
+
+var numCmd = &cobra.Command{
+	Use:                   "num <infile[s]>",
+	Short:                 "Number of records",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := num(args)
 		return err
 	},
 }
