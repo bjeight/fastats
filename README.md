@@ -44,7 +44,7 @@ Pf3D7_API_v3	0.857839
 Pf3D7_MIT_v3	0.684096
 
 ❯ fastats soft -f *softmasked.fasta
-record	atgcn_prop
+file	atgcn_prop
 Pad.softmasked.fasta	0.612057
 Pbi.softmasked.fasta	0.545409
 Pbl.softmasked.fasta	0.576649
