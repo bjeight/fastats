@@ -9,7 +9,11 @@ import (
 
 func length(infiles []string, file bool, counts bool) error {
 
-	fmt.Println("record\tlength")
+	if file {
+		fmt.Println("file\tlength")
+	} else {
+		fmt.Println("record\tlength")
+	}
 
 	for _, infile := range infiles {
 
