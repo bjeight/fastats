@@ -7,13 +7,9 @@ import (
 	"path/filepath"
 )
 
-func length(infiles []string, file bool, counts bool) error {
+func num(infiles []string) error {
 
-	if file {
-		fmt.Println("file\tlength")
-	} else {
-		fmt.Println("record\tlength")
-	}
+	fmt.Println("file\tn_records")
 
 	for _, infile := range infiles {
 
@@ -31,26 +27,21 @@ func length(infiles []string, file bool, counts bool) error {
 			r = NewReader(f)
 		}
 
-		l_total := 0
+		c_total := 0
 
 		for {
-			record, err := r.Read()
+			_, err := r.Read()
 			if err == io.EOF {
 				break
 			}
 			if err != nil {
 				return (err)
 			}
-			if file {
-				l_total += len(record.Seq)
-			} else {
-				fmt.Printf("%s\t%d\n", record.ID, len(record.Seq))
-			}
+
+			c_total += 1
 		}
 
-		if file {
-			fmt.Printf("%s\t%d\n", parseInfile(infile), l_total)
-		}
+		fmt.Printf("%s\t%d\n", parseInfile(infile), c_total)
 	}
 
 	return nil

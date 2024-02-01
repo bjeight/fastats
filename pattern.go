@@ -12,9 +12,14 @@ func pattern(infiles []string, pattern string, file bool, counts bool) error {
 
 	ba := parsePattern(pattern)
 
-	if counts {
+	switch {
+	case file && counts:
+		fmt.Println("file\t" + pattern + "_count")
+	case file && !counts:
+		fmt.Println("file\t" + pattern + "_prop")
+	case !file && counts:
 		fmt.Println("record\t" + pattern + "_count")
-	} else {
+	case !file && !counts:
 		fmt.Println("record\t" + pattern + "_prop")
 	}
 
