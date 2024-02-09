@@ -40,9 +40,6 @@ func lengthRecords(args arguments) error {
 		default:
 			r = NewReader(f)
 		}
-		if err != nil {
-			return err
-		}
 	}
 
 	filename := filenameFromFullPath(args.filepath)
