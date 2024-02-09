@@ -5,12 +5,9 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func pattern(infiles []string, pattern string, file bool, counts bool) error {
-
-	pattern_array := parsePattern(pattern)
 
 	switch {
 	case file && counts:
@@ -23,53 +20,38 @@ func pattern(infiles []string, pattern string, file bool, counts bool) error {
 		fmt.Println("record\t" + pattern + "_prop")
 	}
 
-	if len(infiles) > 0 {
-		for _, infile := range infiles {
-			err := patternFile(infile, pattern_array, file, counts)
-			if err != nil {
-				return err
-			}
-		}
+	err := template(patternRecords, infiles, pattern, file, counts)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func patternRecords(args arguments) error {
+
+	var r *Reader
+	if args.filepath == "stdin" {
+		r = NewReader(os.Stdin)
 	} else {
-		f := os.Stdin
-		r := NewReader(f)
-		filename := "stdin"
-		err := patternRecords(r, pattern_array, filename, file, counts)
+		f, err := os.Open(args.filepath)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		switch filepath.Ext(args.filepath) {
+		case ".gz", ".bgz":
+			r = NewZReader(f)
+		default:
+			r = NewReader(f)
+		}
 		if err != nil {
 			return err
 		}
 	}
 
-	return nil
-}
-
-func patternFile(infile string, pattern_array []byte, file bool, counts bool) error {
-	f, err := os.Open(infile)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	var r *Reader
-	switch filepath.Ext(infile) {
-	case ".gz", ".bgz":
-		r = NewZReader(f)
-	default:
-		r = NewReader(f)
-	}
-
-	filename := parseInfile(infile)
-
-	err = patternRecords(r, pattern_array, filename, file, counts)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func patternRecords(r *Reader, pattern_array []byte, filename string, file bool, counts bool) error {
-
+	filename := filenameFromFullPath(args.filepath)
+	pattern_array := parsePattern(args.pattern)
 	n_total := 0
 	d_total := 0
 
@@ -90,25 +72,24 @@ func patternRecords(r *Reader, pattern_array []byte, filename string, file bool,
 			n += lookup[b]
 		}
 
-		if file {
+		if args.file {
 			n_total += n
 			d_total += len(record.Seq)
 		} else {
-			if counts {
+			if args.counts {
 				fmt.Printf("%s\t%d\n", record.ID, n)
 			} else {
-				stat := float64(n) / float64(len(record.Seq))
-				fmt.Printf("%s\t%f\n", record.ID, stat)
+				proportion := float64(n) / float64(len(record.Seq))
+				fmt.Printf("%s\t%f\n", record.ID, proportion)
 			}
 		}
 	}
-
-	if file {
-		if counts {
+	if args.file {
+		if args.counts {
 			fmt.Printf("%s\t%d\n", filename, n_total)
 		} else {
-			stat := float64(n_total) / float64(d_total)
-			fmt.Printf("%s\t%f\n", filename, stat)
+			proportion := float64(n_total) / float64(d_total)
+			fmt.Printf("%s\t%f\n", filename, proportion)
 		}
 	}
 
@@ -117,9 +98,4 @@ func patternRecords(r *Reader, pattern_array []byte, filename string, file bool,
 
 func parsePattern(pattern string) []byte {
 	return []byte(pattern)
-}
-
-func parseInfile(infile string) string {
-	sa := strings.Split(infile, "/")
-	return sa[len(sa)-1]
 }

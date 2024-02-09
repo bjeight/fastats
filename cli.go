@@ -126,7 +126,7 @@ var lenCmd = &cobra.Command{
 	Short:                 "Sequence length",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := length(args, f)
+		err := length(args, p, f, c)
 		return err
 	},
 }
@@ -136,7 +136,7 @@ var numCmd = &cobra.Command{
 	Short:                 "Number of records",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := num(args)
+		err := num(args, p, f, c)
 		return err
 	},
 }
