@@ -99,16 +99,6 @@ var gapCmd = &cobra.Command{
 	},
 }
 
-var lenCmd = &cobra.Command{
-	Use:                   "len <infile[s]>",
-	Short:                 "Sequence length",
-	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := length(args, f, c)
-		return err
-	},
-}
-
 var softCmd = &cobra.Command{
 	Use:                   "soft <infile[s]>",
 	Short:                 "Softmasked content",
@@ -127,6 +117,16 @@ var patternCmd = &cobra.Command{
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := pattern(args, p, f, c)
+		return err
+	},
+}
+
+var lenCmd = &cobra.Command{
+	Use:                   "len <infile[s]>",
+	Short:                 "Sequence length",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := length(args, f)
 		return err
 	},
 }
