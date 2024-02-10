@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func length(infiles []string, pattern string, file bool, counts bool) error {
+func length(filepaths []string, pattern string, file bool, counts bool) error {
 
 	if file {
 		fmt.Println("file\tlength")
@@ -15,7 +15,7 @@ func length(infiles []string, pattern string, file bool, counts bool) error {
 		fmt.Println("record\tlength")
 	}
 
-	err := template(lengthRecords, infiles, pattern, file, counts)
+	err := template(lengthRecords, filepaths, pattern, file, counts)
 	if err != nil {
 		return err
 	}
@@ -43,6 +43,7 @@ func lengthRecords(args arguments) error {
 	}
 
 	filename := filenameFromFullPath(args.filepath)
+
 	l_total := 0
 
 	for {
@@ -59,6 +60,7 @@ func lengthRecords(args arguments) error {
 			fmt.Printf("%s\t%d\n", record.ID, len(record.Seq))
 		}
 	}
+
 	if args.file {
 		fmt.Printf("%s\t%d\n", filename, l_total)
 	}

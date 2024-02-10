@@ -25,9 +25,9 @@ func main() {
 	}
 }
 
-var p string
 var f bool
 var c bool
+var p string
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -110,7 +110,7 @@ var softCmd = &cobra.Command{
 }
 
 var patternCmd = &cobra.Command{
-	Use: "pattern -p PATTERN <infile>",
+	Use: "pattern -p PATTERN <infile[s]>",
 	Long: `e.g. fastats pattern -p AG <infile[s]>
 `,
 	Short:                 "Arbitrary PATTERN content",

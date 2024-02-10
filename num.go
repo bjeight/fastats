@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 )
 
-func num(infiles []string, pattern string, file bool, counts bool) error {
+func num(filepaths []string, pattern string, file bool, counts bool) error {
 
 	fmt.Println("file\tn_records")
 
-	err := template(numRecords, infiles, pattern, file, counts)
+	err := template(numRecords, filepaths, pattern, file, counts)
 	if err != nil {
 		return err
 	}
@@ -39,6 +39,7 @@ func numRecords(args arguments) error {
 	}
 
 	filename := filenameFromFullPath(args.filepath)
+
 	c_total := 0
 
 	for {

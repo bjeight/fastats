@@ -12,6 +12,7 @@ type arguments struct {
 }
 
 func template(function func(arguments) error, filepaths []string, pattern string, file bool, count bool) error {
+
 	for _, fp := range filepaths {
 		a := arguments{
 			filepath: fp,
@@ -24,6 +25,7 @@ func template(function func(arguments) error, filepaths []string, pattern string
 			return err
 		}
 	}
+
 	if len(filepaths) == 0 {
 		a := arguments{
 			filepath: "stdin",
@@ -36,10 +38,11 @@ func template(function func(arguments) error, filepaths []string, pattern string
 			return err
 		}
 	}
+
 	return nil
 }
 
-func filenameFromFullPath(path string) string {
-	sa := strings.Split(path, "/")
+func filenameFromFullPath(filepath string) string {
+	sa := strings.Split(filepath, "/")
 	return sa[len(sa)-1]
 }

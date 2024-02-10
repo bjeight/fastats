@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func pattern(infiles []string, pattern string, file bool, counts bool) error {
+func pattern(filepaths []string, pattern string, file bool, counts bool) error {
 
 	switch {
 	case file && counts:
@@ -20,7 +20,7 @@ func pattern(infiles []string, pattern string, file bool, counts bool) error {
 		fmt.Println("record\t" + pattern + "_prop")
 	}
 
-	err := template(patternRecords, infiles, pattern, file, counts)
+	err := template(patternRecords, filepaths, pattern, file, counts)
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,8 @@ func patternRecords(args arguments) error {
 	}
 
 	filename := filenameFromFullPath(args.filepath)
-	pattern_array := parsePattern(args.pattern)
+	pattern_slice := []byte(args.pattern)
+
 	n_total := 0
 	d_total := 0
 
@@ -65,7 +66,7 @@ func patternRecords(args arguments) error {
 			lookup[nuc] += 1
 		}
 		n := 0
-		for _, b := range pattern_array {
+		for _, b := range pattern_slice {
 			n += lookup[b]
 		}
 
@@ -81,6 +82,7 @@ func patternRecords(args arguments) error {
 			}
 		}
 	}
+
 	if args.file {
 		if args.counts {
 			fmt.Printf("%s\t%d\n", filename, n_total)
@@ -91,8 +93,4 @@ func patternRecords(args arguments) error {
 	}
 
 	return nil
-}
-
-func parsePattern(pattern string) []byte {
-	return []byte(pattern)
 }
