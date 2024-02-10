@@ -12,7 +12,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.3.0",
+		Version:           "0.4.0",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -25,9 +25,9 @@ func main() {
 	}
 }
 
-var p string
 var f bool
 var c bool
+var p string
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -99,16 +99,6 @@ var gapCmd = &cobra.Command{
 	},
 }
 
-var lenCmd = &cobra.Command{
-	Use:                   "len <infile[s]>",
-	Short:                 "Sequence length",
-	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := length(args, f, c)
-		return err
-	},
-}
-
 var softCmd = &cobra.Command{
 	Use:                   "soft <infile[s]>",
 	Short:                 "Softmasked content",
@@ -120,7 +110,7 @@ var softCmd = &cobra.Command{
 }
 
 var patternCmd = &cobra.Command{
-	Use: "pattern -p PATTERN <infile>",
+	Use: "pattern -p PATTERN <infile[s]>",
 	Long: `e.g. fastats pattern -p AG <infile[s]>
 `,
 	Short:                 "Arbitrary PATTERN content",
@@ -131,12 +121,22 @@ var patternCmd = &cobra.Command{
 	},
 }
 
+var lenCmd = &cobra.Command{
+	Use:                   "len <infile[s]>",
+	Short:                 "Sequence length",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := length(args, p, f, c)
+		return err
+	},
+}
+
 var numCmd = &cobra.Command{
 	Use:                   "num <infile[s]>",
 	Short:                 "Number of records",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := num(args)
+		err := num(args, p, f, c)
 		return err
 	},
 }

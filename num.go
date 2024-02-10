@@ -7,42 +7,52 @@ import (
 	"path/filepath"
 )
 
-func num(infiles []string) error {
+func num(filepaths []string, pattern string, file bool, counts bool) error {
 
 	fmt.Println("file\tn_records")
 
-	for _, infile := range infiles {
+	err := template(numRecords, filepaths, pattern, file, counts)
+	if err != nil {
+		return err
+	}
 
-		f, err := os.Open(infile)
+	return nil
+}
+
+func numRecords(args arguments) error {
+
+	var r *Reader
+	if args.filepath == "stdin" {
+		r = NewReader(os.Stdin)
+	} else {
+		f, err := os.Open(args.filepath)
 		if err != nil {
-			return (err)
+			return err
 		}
 		defer f.Close()
-
-		var r *Reader
-		switch filepath.Ext(infile) {
+		switch filepath.Ext(args.filepath) {
 		case ".gz", ".bgz":
 			r = NewZReader(f)
 		default:
 			r = NewReader(f)
 		}
-
-		c_total := 0
-
-		for {
-			_, err := r.Read()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				return (err)
-			}
-
-			c_total += 1
-		}
-
-		fmt.Printf("%s\t%d\n", parseInfile(infile), c_total)
 	}
+
+	filename := filenameFromFullPath(args.filepath)
+
+	c_total := 0
+
+	for {
+		_, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		c_total += 1
+	}
+	fmt.Printf("%s\t%d\n", filename, c_total)
 
 	return nil
 }

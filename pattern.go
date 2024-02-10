@@ -5,12 +5,9 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
-func pattern(infiles []string, pattern string, file bool, counts bool) error {
-
-	ba := parsePattern(pattern)
+func pattern(filepaths []string, pattern string, file bool, counts bool) error {
 
 	switch {
 	case file && counts:
@@ -23,73 +20,77 @@ func pattern(infiles []string, pattern string, file bool, counts bool) error {
 		fmt.Println("record\t" + pattern + "_prop")
 	}
 
-	for _, infile := range infiles {
-
-		f, err := os.Open(infile)
-		if err != nil {
-			return (err)
-		}
-		defer f.Close()
-
-		var r *Reader
-		switch filepath.Ext(infile) {
-		case ".gz", ".bgz":
-			r = NewZReader(f)
-		default:
-			r = NewReader(f)
-		}
-
-		n_total := 0
-		d_total := 0
-
-		for {
-			record, err := r.Read()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				return (err)
-			}
-			var lookup [256]int
-			for _, nuc := range record.Seq {
-				lookup[nuc] += 1
-			}
-			n := 0
-			for _, b := range ba {
-				n += lookup[b]
-			}
-
-			if file {
-				n_total += n
-				d_total += len(record.Seq)
-			} else {
-				if counts {
-					fmt.Printf("%s\t%d\n", record.ID, n)
-				} else {
-					stat := float64(n) / float64(len(record.Seq))
-					fmt.Printf("%s\t%f\n", record.ID, stat)
-				}
-			}
-		}
-
-		if file {
-			if counts {
-				fmt.Printf("%s\t%d\n", parseInfile(infile), n_total)
-			} else {
-				stat := float64(n_total) / float64(d_total)
-				fmt.Printf("%s\t%f\n", parseInfile(infile), stat)
-			}
-		}
+	err := template(patternRecords, filepaths, pattern, file, counts)
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func parsePattern(pattern string) []byte {
-	return []byte(pattern)
-}
+func patternRecords(args arguments) error {
 
-func parseInfile(infile string) string {
-	sa := strings.Split(infile, "/")
-	return sa[len(sa)-1]
+	var r *Reader
+	if args.filepath == "stdin" {
+		r = NewReader(os.Stdin)
+	} else {
+		f, err := os.Open(args.filepath)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		switch filepath.Ext(args.filepath) {
+		case ".gz", ".bgz":
+			r = NewZReader(f)
+		default:
+			r = NewReader(f)
+		}
+	}
+
+	filename := filenameFromFullPath(args.filepath)
+	pattern_slice := []byte(args.pattern)
+
+	n_total := 0
+	d_total := 0
+
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		var lookup [256]int
+		for _, nuc := range record.Seq {
+			lookup[nuc] += 1
+		}
+		n := 0
+		for _, b := range pattern_slice {
+			n += lookup[b]
+		}
+
+		if args.file {
+			n_total += n
+			d_total += len(record.Seq)
+		} else {
+			if args.counts {
+				fmt.Printf("%s\t%d\n", record.ID, n)
+			} else {
+				proportion := float64(n) / float64(len(record.Seq))
+				fmt.Printf("%s\t%f\n", record.ID, proportion)
+			}
+		}
+	}
+
+	if args.file {
+		if args.counts {
+			fmt.Printf("%s\t%d\n", filename, n_total)
+		} else {
+			proportion := float64(n_total) / float64(d_total)
+			fmt.Printf("%s\t%f\n", filename, proportion)
+		}
+	}
+
+	return nil
 }

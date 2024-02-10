@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func length(infiles []string, file bool, counts bool) error {
+func length(filepaths []string, pattern string, file bool, counts bool) error {
 
 	if file {
 		fmt.Println("file\tlength")
@@ -15,42 +15,54 @@ func length(infiles []string, file bool, counts bool) error {
 		fmt.Println("record\tlength")
 	}
 
-	for _, infile := range infiles {
+	err := template(lengthRecords, filepaths, pattern, file, counts)
+	if err != nil {
+		return err
+	}
 
-		f, err := os.Open(infile)
+	return nil
+}
+
+func lengthRecords(args arguments) error {
+
+	var r *Reader
+	if args.filepath == "stdin" {
+		r = NewReader(os.Stdin)
+	} else {
+		f, err := os.Open(args.filepath)
 		if err != nil {
-			return (err)
+			return err
 		}
 		defer f.Close()
-
-		var r *Reader
-		switch filepath.Ext(infile) {
+		switch filepath.Ext(args.filepath) {
 		case ".gz", ".bgz":
 			r = NewZReader(f)
 		default:
 			r = NewReader(f)
 		}
+	}
 
-		l_total := 0
+	filename := filenameFromFullPath(args.filepath)
 
-		for {
-			record, err := r.Read()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				return (err)
-			}
-			if file {
-				l_total += len(record.Seq)
-			} else {
-				fmt.Printf("%s\t%d\n", record.ID, len(record.Seq))
-			}
+	l_total := 0
+
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
 		}
-
-		if file {
-			fmt.Printf("%s\t%d\n", parseInfile(infile), l_total)
+		if err != nil {
+			return (err)
 		}
+		if args.file {
+			l_total += len(record.Seq)
+		} else {
+			fmt.Printf("%s\t%d\n", record.ID, len(record.Seq))
+		}
+	}
+
+	if args.file {
+		fmt.Printf("%s\t%d\n", filename, l_total)
 	}
 
 	return nil
