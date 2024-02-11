@@ -54,6 +54,11 @@ Ppr.softmasked.fasta	0.539591
 Pre.softmasked.fasta	0.535700
 ```
 
+```
+❯ bgzip -d -c GRCh38.p14.genome.fa.bgz | fastats gc | grep "Y"
+chrY	0.184749
+```
+
 ### Help
 
 ```
