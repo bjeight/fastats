@@ -6,7 +6,7 @@ import (
 )
 
 // pattern() is fastats at, gc, gaps etc. in the cli. It writes the appropriate header (which
-// depends on the cli arguments), then passes lengthRecords() + the cli arguments + the writer to
+// depends on the cli arguments), then passes patternRecords() + the cli arguments + the writer to
 // collectCommandLine which processes the fasta file(s) from the command line or stdin, depending
 // on what is provided by the user.
 func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool) error {
