@@ -3,29 +3,38 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
-	"path/filepath"
 )
 
-// pattern() is fastats at, gc, atgc etc. in the cli. It prints the appropriate header,
-// depending on the cli aguments, then passes patternRecords() + the cli arguments to template,
-// which processes the fasta file(s) from the command line or stdin, depending on what
-//
-//	is provided by the user.
-func pattern(filepaths []string, pattern string, file bool, counts bool) error {
+// pattern() is fastats at, gc, gaps etc. in the cli. It writes the appropriate header (which
+// depends on the cli arguments), then passes lengthRecords() + the cli arguments + the writer to
+// collectCommandLine which processes the fasta file(s) from the command line or stdin, depending
+// on what is provided by the user.
+func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool) error {
 
 	switch {
 	case file && counts:
-		fmt.Println("file\t" + pattern + "_count")
+		_, err := w.Write([]byte("file\t" + pattern + "_count\n"))
+		if err != nil {
+			return err
+		}
 	case file && !counts:
-		fmt.Println("file\t" + pattern + "_prop")
+		_, err := w.Write([]byte("file\t" + pattern + "_prop\n"))
+		if err != nil {
+			return err
+		}
 	case !file && counts:
-		fmt.Println("record\t" + pattern + "_count")
+		_, err := w.Write([]byte("record\t" + pattern + "_count\n"))
+		if err != nil {
+			return err
+		}
 	case !file && !counts:
-		fmt.Println("record\t" + pattern + "_prop")
+		_, err := w.Write([]byte("record\t" + pattern + "_prop\n"))
+		if err != nil {
+			return err
+		}
 	}
 
-	err := template(patternRecords, filepaths, pattern, file, counts)
+	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts)
 	if err != nil {
 		return err
 	}
@@ -34,26 +43,7 @@ func pattern(filepaths []string, pattern string, file bool, counts bool) error {
 }
 
 // lengthRecords does the work of fastats at, gc, etc. for one fasta file at a time.
-func patternRecords(args arguments) error {
-
-	// open stdin or a file
-	var r *Reader
-	if args.filepath == "stdin" {
-		r = NewReader(os.Stdin)
-	} else {
-		f, err := os.Open(args.filepath)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		// depending on whwether the fasta file is compressed or not, provide the correct reader
-		switch filepath.Ext(args.filepath) {
-		case ".gz", ".bgz":
-			r = NewZReader(f)
-		default:
-			r = NewReader(f)
-		}
-	}
+func patternRecords(r *Reader, args arguments, w io.Writer) error {
 
 	// get the file name in case we need to print it to stdout
 	filename := filenameFromFullPath(args.filepath)
@@ -67,6 +57,7 @@ func patternRecords(args arguments) error {
 	n_total := 0
 	l_total := 0
 
+	// iterate over every record in the fasta file
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
@@ -89,17 +80,25 @@ func patternRecords(args arguments) error {
 		}
 
 		// if the statistic is to be calculated per file, add this record's pattern count
-		// and length to the total, else print this records statistic.
+		// and length to the total, else write this records statistic.
 		if args.file {
 			n_total += n
 			l_total += len(record.Seq)
 		} else {
 			// print a count or a proportion
 			if args.counts {
-				fmt.Printf("%s\t%d\n", record.ID, n)
+				s := fmt.Sprintf("%s\t%d\n", record.ID, n)
+				_, err := w.Write([]byte(s))
+				if err != nil {
+					return err
+				}
 			} else {
 				proportion := float64(n) / float64(len(record.Seq))
-				fmt.Printf("%s\t%f\n", record.ID, proportion)
+				s := fmt.Sprintf("%s\t%f\n", record.ID, proportion)
+				_, err := w.Write([]byte(s))
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -108,10 +107,18 @@ func patternRecords(args arguments) error {
 	// the records have been processed
 	if args.file {
 		if args.counts {
-			fmt.Printf("%s\t%d\n", filename, n_total)
+			s := fmt.Sprintf("%s\t%d\n", filename, n_total)
+			_, err := w.Write([]byte(s))
+			if err != nil {
+				return err
+			}
 		} else {
 			proportion := float64(n_total) / float64(l_total)
-			fmt.Printf("%s\t%f\n", filename, proportion)
+			s := fmt.Sprintf("%s\t%f\n", filename, proportion)
+			_, err := w.Write([]byte(s))
+			if err != nil {
+				return err
+			}
 		}
 	}
 

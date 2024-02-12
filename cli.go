@@ -54,7 +54,7 @@ var atCmd = &cobra.Command{
 	Short:                 "AT content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(args, "ATat", f, c)
+		err = pattern(os.Stdout, args, "ATat", f, c)
 		return err
 	},
 }
@@ -64,7 +64,7 @@ var gcCmd = &cobra.Command{
 	Short:                 "GC content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(args, "GCgc", f, c)
+		err := pattern(os.Stdout, args, "GCgc", f, c)
 		return err
 	},
 }
@@ -74,7 +74,7 @@ var atgcCmd = &cobra.Command{
 	Short:                 "ATGC content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(args, "ATGCatgc", f, c)
+		err := pattern(os.Stdout, args, "ATGCatgc", f, c)
 		return err
 	},
 }
@@ -84,7 +84,7 @@ var nCmd = &cobra.Command{
 	Short:                 "N content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(args, "Nn", f, c)
+		err := pattern(os.Stdout, args, "Nn", f, c)
 		return err
 	},
 }
@@ -94,7 +94,7 @@ var gapCmd = &cobra.Command{
 	Short:                 "Gap content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(args, "-", f, c)
+		err := pattern(os.Stdout, args, "-", f, c)
 		return err
 	},
 }
@@ -104,7 +104,7 @@ var softCmd = &cobra.Command{
 	Short:                 "Softmasked content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(args, "atgcn", f, c)
+		err := pattern(os.Stdout, args, "atgcn", f, c)
 		return err
 	},
 }
@@ -116,7 +116,7 @@ var patternCmd = &cobra.Command{
 	Short:                 "Arbitrary PATTERN content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(args, p, f, c)
+		err := pattern(os.Stdout, args, p, f, c)
 		return err
 	},
 }
@@ -126,7 +126,7 @@ var lenCmd = &cobra.Command{
 	Short:                 "Sequence length",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := length(args, p, f, c)
+		err := length(os.Stdout, args, p, f, c)
 		return err
 	},
 }
@@ -136,7 +136,7 @@ var numCmd = &cobra.Command{
 	Short:                 "Number of records",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := num(args, p, f, c)
+		err := num(os.Stdout, args, p, f, c)
 		return err
 	},
 }
