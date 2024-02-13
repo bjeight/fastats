@@ -42,7 +42,7 @@ func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts 
 	return nil
 }
 
-// lengthRecords does the work of fastats at, gc, etc. for one fasta file at a time.
+// patternRecords does the work of fastats at, gc, etc. for one fasta file at a time.
 func patternRecords(r *Reader, args arguments, w io.Writer) error {
 
 	// get the file name in case we need to print it to stdout
