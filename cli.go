@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -20,7 +19,6 @@ var (
 func main() {
 	err := rootCmd.Execute()
 	if err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }
@@ -63,8 +61,8 @@ var gcCmd = &cobra.Command{
 	Use:                   "gc <infile[s]>",
 	Short:                 "GC content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(os.Stdout, args, "GCgc", f, c)
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = pattern(os.Stdout, args, "GCgc", f, c)
 		return err
 	},
 }
@@ -73,8 +71,8 @@ var atgcCmd = &cobra.Command{
 	Use:                   "atgc <infile[s]>",
 	Short:                 "ATGC content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(os.Stdout, args, "ATGCatgc", f, c)
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = pattern(os.Stdout, args, "ATGCatgc", f, c)
 		return err
 	},
 }
@@ -83,8 +81,8 @@ var nCmd = &cobra.Command{
 	Use:                   "n <infile[s]>",
 	Short:                 "N content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(os.Stdout, args, "Nn", f, c)
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = pattern(os.Stdout, args, "Nn", f, c)
 		return err
 	},
 }
@@ -93,8 +91,8 @@ var gapCmd = &cobra.Command{
 	Use:                   "gaps <infile[s]>",
 	Short:                 "Gap content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(os.Stdout, args, "-", f, c)
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = pattern(os.Stdout, args, "-", f, c)
 		return err
 	},
 }
@@ -103,8 +101,8 @@ var softCmd = &cobra.Command{
 	Use:                   "soft <infile[s]>",
 	Short:                 "Softmasked content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(os.Stdout, args, "atgcn", f, c)
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = pattern(os.Stdout, args, "atgcn", f, c)
 		return err
 	},
 }
@@ -115,8 +113,8 @@ var patternCmd = &cobra.Command{
 `,
 	Short:                 "Arbitrary PATTERN content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pattern(os.Stdout, args, p, f, c)
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = pattern(os.Stdout, args, p, f, c)
 		return err
 	},
 }
@@ -125,8 +123,8 @@ var lenCmd = &cobra.Command{
 	Use:                   "len <infile[s]>",
 	Short:                 "Sequence length",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := length(os.Stdout, args, p, f, c)
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = length(os.Stdout, args, p, f, c)
 		return err
 	},
 }
@@ -135,8 +133,8 @@ var numCmd = &cobra.Command{
 	Use:                   "num <infile[s]>",
 	Short:                 "Number of records",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := num(os.Stdout, args, p, f, c)
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = num(os.Stdout, args, p, f, c)
 		return err
 	},
 }
