@@ -42,7 +42,9 @@ Pf3D7_13_v3	0.810485
 Pf3D7_14_v3	0.815636
 Pf3D7_API_v3	0.857839
 Pf3D7_MIT_v3	0.684096
+```
 
+```
 ❯ fastats soft -f *softmasked.fasta
 file	atgcn_prop
 Pad.softmasked.fasta	0.612057
@@ -76,15 +78,17 @@ Available Commands:
   help        Help about any command
   len         Sequence length
   n           N content
+  names       Record names
   num         Number of records
   pattern     Arbitrary PATTERN content
   soft        Softmasked content
 
 Flags:
-  -c, --count     print counts (default is proportions)
-  -f, --file      calculate statistics per file (default is per record)
-  -h, --help      help for fastats
-  -v, --version   version for fastats
+  -c, --count         print counts (default is proportions)
+  -d, --description   write record descriptions (default is IDs)
+  -f, --file          calculate statistics per file (default is per record)
+  -h, --help          help for fastats
+  -v, --version       version for fastats
 
 Use "fastats [command] --help" for more information about a command.
 ```
