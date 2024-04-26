@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"testing"
+
+	"github.com/bjeight/fastats/fasta"
 )
 
 func Test_length(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, false)
+	err := length(out, []string{}, "", false, false, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -21,7 +23,7 @@ func Test_length(t *testing.T) {
 
 func Test_lengthFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, false)
+	err := length(out, []string{}, "", true, false, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,7 +37,7 @@ stdin	0
 
 func Test_lengthCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, true)
+	err := length(out, []string{}, "", false, true, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -48,7 +50,7 @@ func Test_lengthCounts(t *testing.T) {
 
 func Test_lengthFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, true)
+	err := length(out, []string{}, "", true, true, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -72,16 +74,17 @@ ATG
 ATGN
 `)
 	fastaR := bytes.NewReader(fastaData)
-	r := NewReader(fastaR)
+	r := fasta.NewReader(fastaR)
 	out := new(bytes.Buffer)
 
 	lengthRecords(
 		r,
 		arguments{
-			filepath: "/path/to/myfile.fasta",
-			file:     false,
-			counts:   false,
-			pattern:  "",
+			filepath:    "/path/to/myfile.fasta",
+			file:        false,
+			counts:      false,
+			description: false,
+			pattern:     "",
 		},
 		out,
 	)
@@ -109,16 +112,17 @@ ATG
 ATGN
 `)
 	fastaR := bytes.NewReader(fastaData)
-	r := NewReader(fastaR)
+	r := fasta.NewReader(fastaR)
 	out := new(bytes.Buffer)
 
 	lengthRecords(
 		r,
 		arguments{
-			filepath: "/path/to/myfile.fasta",
-			file:     true,
-			counts:   false,
-			pattern:  "",
+			filepath:    "/path/to/myfile.fasta",
+			file:        true,
+			counts:      false,
+			description: false,
+			pattern:     "",
 		},
 		out,
 	)

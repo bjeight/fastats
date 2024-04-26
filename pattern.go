@@ -3,13 +3,15 @@ package main
 import (
 	"fmt"
 	"io"
+
+	"github.com/bjeight/fastats/fasta"
 )
 
 // pattern() is fastats at, gc, gaps etc. in the cli. It writes the appropriate header (which
 // depends on the cli arguments), then passes patternRecords() + the cli arguments + the writer to
 // collectCommandLine which processes the fasta file(s) from the command line or stdin, depending
 // on what is provided by the user.
-func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool) error {
+func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool) error {
 
 	switch {
 	case file && counts:
@@ -34,7 +36,7 @@ func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts 
 		}
 	}
 
-	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts)
+	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts, description)
 	if err != nil {
 		return err
 	}
@@ -43,7 +45,7 @@ func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts 
 }
 
 // patternRecords does the work of fastats at, gc, etc. for one fasta file at a time.
-func patternRecords(r *Reader, args arguments, w io.Writer) error {
+func patternRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 
 	// get the file name in case we need to print it to stdout
 	filename := filenameFromFullPath(args.filepath)
@@ -87,14 +89,14 @@ func patternRecords(r *Reader, args arguments, w io.Writer) error {
 		} else {
 			// print a count or a proportion
 			if args.counts {
-				s := fmt.Sprintf("%s\t%d\n", record.ID, n)
+				s := fmt.Sprintf("%s\t%d\n", return_record_name(record, args.description), n)
 				_, err := w.Write([]byte(s))
 				if err != nil {
 					return err
 				}
 			} else {
 				proportion := float64(n) / float64(len(record.Seq))
-				s := fmt.Sprintf("%s\t%f\n", record.ID, proportion)
+				s := fmt.Sprintf("%s\t%f\n", return_record_name(record, args.description), proportion)
 				_, err := w.Write([]byte(s))
 				if err != nil {
 					return err

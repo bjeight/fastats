@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"testing"
+
+	"github.com/bjeight/fastats/fasta"
 )
 
 func Test_pattern(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, false)
+	err := pattern(out, []string{}, "ATat", false, false, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -21,7 +23,7 @@ func Test_pattern(t *testing.T) {
 
 func Test_patternFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, false)
+	err := pattern(out, []string{}, "ATat", true, false, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,7 +37,7 @@ stdin	NaN
 
 func Test_patternCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, true)
+	err := pattern(out, []string{}, "ATat", false, true, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -48,7 +50,7 @@ func Test_patternCounts(t *testing.T) {
 
 func Test_patternFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, true)
+	err := pattern(out, []string{}, "ATat", true, true, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -72,16 +74,17 @@ ATGC
 AT
 `)
 	fastaR := bytes.NewReader(fastaData)
-	r := NewReader(fastaR)
+	r := fasta.NewReader(fastaR)
 	out := new(bytes.Buffer)
 
 	patternRecords(
 		r,
 		arguments{
-			filepath: "/path/to/myfile.fasta",
-			file:     false,
-			counts:   false,
-			pattern:  "ATat",
+			filepath:    "/path/to/myfile.fasta",
+			file:        false,
+			counts:      false,
+			description: false,
+			pattern:     "ATat",
 		},
 		out,
 	)
@@ -109,16 +112,17 @@ ATGC
 AT
 `)
 	fastaR := bytes.NewReader(fastaData)
-	r := NewReader(fastaR)
+	r := fasta.NewReader(fastaR)
 	out := new(bytes.Buffer)
 
 	patternRecords(
 		r,
 		arguments{
-			filepath: "/path/to/myfile.fasta",
-			file:     false,
-			counts:   false,
-			pattern:  "GCgc",
+			filepath:    "/path/to/myfile.fasta",
+			file:        false,
+			counts:      false,
+			description: false,
+			pattern:     "GCgc",
 		},
 		out,
 	)
@@ -146,16 +150,17 @@ ATGC
 ATGC
 `)
 	fastaR := bytes.NewReader(fastaData)
-	r := NewReader(fastaR)
+	r := fasta.NewReader(fastaR)
 	out := new(bytes.Buffer)
 
 	patternRecords(
 		r,
 		arguments{
-			filepath: "/path/to/myfile.fasta",
-			file:     true,
-			counts:   false,
-			pattern:  "ATat",
+			filepath:    "/path/to/myfile.fasta",
+			file:        true,
+			counts:      false,
+			description: false,
+			pattern:     "ATat",
 		},
 		out,
 	)
@@ -181,16 +186,17 @@ ATGC
 AT
 `)
 	fastaR := bytes.NewReader(fastaData)
-	r := NewReader(fastaR)
+	r := fasta.NewReader(fastaR)
 	out := new(bytes.Buffer)
 
 	patternRecords(
 		r,
 		arguments{
-			filepath: "/path/to/myfile.fasta",
-			file:     false,
-			counts:   true,
-			pattern:  "ATat",
+			filepath:    "/path/to/myfile.fasta",
+			file:        false,
+			counts:      true,
+			description: false,
+			pattern:     "ATat",
 		},
 		out,
 	)
@@ -218,16 +224,17 @@ ATGC
 AT
 `)
 	fastaR := bytes.NewReader(fastaData)
-	r := NewReader(fastaR)
+	r := fasta.NewReader(fastaR)
 	out := new(bytes.Buffer)
 
 	patternRecords(
 		r,
 		arguments{
-			filepath: "/path/to/myfile.fasta",
-			file:     true,
-			counts:   true,
-			pattern:  "ATat",
+			filepath:    "/path/to/myfile.fasta",
+			file:        true,
+			counts:      true,
+			description: false,
+			pattern:     "ATat",
 		},
 		out,
 	)

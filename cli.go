@@ -11,7 +11,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.5.0",
+		Version:           "0.6.0",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -26,13 +26,16 @@ func main() {
 var f bool
 var c bool
 var p string
+var d bool
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
 	rootCmd.PersistentFlags().BoolVarP(&c, "count", "c", false, "print counts (default is proportions)")
+	rootCmd.PersistentFlags().BoolVarP(&d, "description", "d", false, "write record descriptions (default is IDs)")
 
 	rootCmd.PersistentFlags().Lookup("file").NoOptDefVal = "true"
 	rootCmd.PersistentFlags().Lookup("count").NoOptDefVal = "true"
+	rootCmd.PersistentFlags().Lookup("description").NoOptDefVal = "true"
 
 	rootCmd.AddCommand(atCmd)
 	rootCmd.AddCommand(gcCmd)
@@ -43,6 +46,7 @@ func init() {
 	rootCmd.AddCommand(softCmd)
 	rootCmd.AddCommand(patternCmd)
 	rootCmd.AddCommand(numCmd)
+	rootCmd.AddCommand(nameCmd)
 
 	patternCmd.Flags().StringVarP(&p, "pattern", "p", "", "arbitrary pattern to parse")
 }
@@ -52,7 +56,7 @@ var atCmd = &cobra.Command{
 	Short:                 "AT content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "ATat", f, c)
+		err = pattern(os.Stdout, args, "ATat", f, c, d)
 		return err
 	},
 }
@@ -62,7 +66,7 @@ var gcCmd = &cobra.Command{
 	Short:                 "GC content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "GCgc", f, c)
+		err = pattern(os.Stdout, args, "GCgc", f, c, d)
 		return err
 	},
 }
@@ -72,7 +76,7 @@ var atgcCmd = &cobra.Command{
 	Short:                 "ATGC content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "ATGCatgc", f, c)
+		err = pattern(os.Stdout, args, "ATGCatgc", f, c, d)
 		return err
 	},
 }
@@ -82,7 +86,7 @@ var nCmd = &cobra.Command{
 	Short:                 "N content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "Nn", f, c)
+		err = pattern(os.Stdout, args, "Nn", f, c, d)
 		return err
 	},
 }
@@ -92,7 +96,7 @@ var gapCmd = &cobra.Command{
 	Short:                 "Gap content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "-", f, c)
+		err = pattern(os.Stdout, args, "-", f, c, d)
 		return err
 	},
 }
@@ -102,7 +106,7 @@ var softCmd = &cobra.Command{
 	Short:                 "Softmasked content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "atgcn", f, c)
+		err = pattern(os.Stdout, args, "atgcn", f, c, d)
 		return err
 	},
 }
@@ -114,7 +118,7 @@ var patternCmd = &cobra.Command{
 	Short:                 "Arbitrary PATTERN content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, p, f, c)
+		err = pattern(os.Stdout, args, p, f, c, d)
 		return err
 	},
 }
@@ -124,7 +128,7 @@ var lenCmd = &cobra.Command{
 	Short:                 "Sequence length",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = length(os.Stdout, args, p, f, c)
+		err = length(os.Stdout, args, p, f, c, d)
 		return err
 	},
 }
@@ -134,7 +138,17 @@ var numCmd = &cobra.Command{
 	Short:                 "Number of records",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = num(os.Stdout, args, p, f, c)
+		err = num(os.Stdout, args, p, f, c, d)
+		return err
+	},
+}
+
+var nameCmd = &cobra.Command{
+	Use:                   "names <infile[s]>",
+	Short:                 "Record names",
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		err = names(os.Stdout, args, p, f, c, d)
 		return err
 	},
 }

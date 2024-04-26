@@ -3,19 +3,21 @@ package main
 import (
 	"fmt"
 	"io"
+
+	"github.com/bjeight/fastats/fasta"
 )
 
 // num() is fastats num in the cli. It writes the header, then passes numRecords() + the
 // cli arguments + the writer to collectCommandLine, which processes the fasta file(s)
 // from the command line or stdin, depending on what is provided by the user.
-func num(w io.Writer, filepaths []string, pattern string, file bool, counts bool) error {
+func num(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool) error {
 
 	_, err := w.Write([]byte("file\tn_records\n"))
 	if err != nil {
 		return err
 	}
 
-	err = collectCommandLine(w, numRecords, filepaths, pattern, file, counts)
+	err = collectCommandLine(w, numRecords, filepaths, pattern, file, counts, description)
 	if err != nil {
 		return err
 	}
@@ -24,7 +26,7 @@ func num(w io.Writer, filepaths []string, pattern string, file bool, counts bool
 }
 
 // numRecords does the work of fastats num for one fasta file at a time.
-func numRecords(r *Reader, args arguments, w io.Writer) error {
+func numRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 
 	// get the file name for when we need to print it
 	filename := filenameFromFullPath(args.filepath)

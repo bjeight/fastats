@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"testing"
+
+	"github.com/bjeight/fastats/fasta"
 )
 
 func Test_num(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, false)
+	err := num(out, []string{}, "", false, false, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -22,7 +24,7 @@ stdin	0
 
 func Test_numFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, false)
+	err := num(out, []string{}, "", true, false, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -36,7 +38,7 @@ stdin	0
 
 func Test_numCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, true)
+	err := num(out, []string{}, "", false, true, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +52,7 @@ stdin	0
 
 func Test_numFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, true)
+	err := num(out, []string{}, "", true, true, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -74,16 +76,17 @@ ATG
 ATGN
 `)
 	fastaR := bytes.NewReader(fastaData)
-	r := NewReader(fastaR)
+	r := fasta.NewReader(fastaR)
 	out := new(bytes.Buffer)
 
 	numRecords(
 		r,
 		arguments{
-			filepath: "/path/to/myfile.fasta",
-			file:     false,
-			counts:   false,
-			pattern:  "",
+			filepath:    "/path/to/myfile.fasta",
+			file:        false,
+			counts:      false,
+			description: false,
+			pattern:     "",
 		},
 		out,
 	)

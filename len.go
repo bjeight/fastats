@@ -3,13 +3,15 @@ package main
 import (
 	"fmt"
 	"io"
+
+	"github.com/bjeight/fastats/fasta"
 )
 
 // length() is fastats len in the cli. It writes the appropriate header (which depends on the cli
 // arguments), then passes lengthRecords() + the cli arguments + the writer to collectCommandLine,
 // which processes the fasta file(s) from the command line or stdin, depending on what is provided
 // by the user.
-func length(w io.Writer, filepaths []string, pattern string, file bool, counts bool) error {
+func length(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool) error {
 
 	// print the correct header to stdout, depending on whether the statistics are
 	// to be calculated per file or per record
@@ -26,7 +28,7 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 	}
 
 	// pass lengthRecords + the cli arguments to template() for processesing the fasta file(s)
-	err := collectCommandLine(w, lengthRecords, filepaths, pattern, file, counts)
+	err := collectCommandLine(w, lengthRecords, filepaths, pattern, file, counts, description)
 	if err != nil {
 		return err
 	}
@@ -35,7 +37,7 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 }
 
 // lengthRecords does the work of fastats len for one fasta file at a time.
-func lengthRecords(r *Reader, args arguments, w io.Writer) error {
+func lengthRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 
 	// get the file name in case we need to print it to stdout
 	filename := filenameFromFullPath(args.filepath)
@@ -57,7 +59,7 @@ func lengthRecords(r *Reader, args arguments, w io.Writer) error {
 		if args.file {
 			l_total += len(record.Seq)
 		} else {
-			s := fmt.Sprintf("%s\t%d\n", record.ID, len(record.Seq))
+			s := fmt.Sprintf("%s\t%d\n", return_record_name(record, args.description), len(record.Seq))
 			_, err := w.Write([]byte(s))
 			if err != nil {
 				return err

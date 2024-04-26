@@ -1,4 +1,4 @@
-package main
+package fasta
 
 import (
 	"bufio"
@@ -123,4 +123,14 @@ func (r *Reader) Read() (FastaRecord, error) {
 	FR.Seq = buffer
 
 	return FR, err
+}
+
+func (r *Reader) Seek(offset int) error {
+	for i := 0; i < offset; i++ {
+		_, err := r.r.ReadByte()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
