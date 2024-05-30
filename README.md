@@ -61,6 +61,11 @@ Pre.softmasked.fasta	0.535700
 chrY	0.184749
 ```
 
+```
+❯ fastats gc GRCh38.p14.genome.fa.bgz | grep "X"
+chrX	0.392343
+```
+
 ### Help
 
 ```
