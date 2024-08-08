@@ -10,7 +10,7 @@ import (
 
 func Test_pattern(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, false, false)
+	err := pattern(out, []string{}, "ATat", false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +23,7 @@ func Test_pattern(t *testing.T) {
 
 func Test_patternFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, false, false)
+	err := pattern(out, []string{}, "ATat", true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,7 +37,7 @@ stdin	NaN
 
 func Test_patternCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, true, false)
+	err := pattern(out, []string{}, "ATat", false, true, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +50,7 @@ func Test_patternCounts(t *testing.T) {
 
 func Test_patternFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, true, false)
+	err := pattern(out, []string{}, "ATat", true, true, false, "")
 	if err != nil {
 		t.Error(err)
 	}

@@ -15,13 +15,14 @@ type arguments struct {
 	counts      bool
 	description bool
 	pattern     string
+	lenFormat   string
 }
 
 type fastatsFunction func(*fasta.Reader, arguments, io.Writer) error
 
 // For every file provided on the command line, template applies the correct functionality based on the cli arguments.
 // If no files are provided, it signals that we should try to read an uncompressed fasta file from stdin.
-func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pattern string, file bool, count bool, description bool) error {
+func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pattern string, file bool, count bool, description bool, lenFormat string) error {
 
 	// for every file provided on the command line...
 	for _, fp := range filepaths {
@@ -32,6 +33,7 @@ func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pat
 			counts:      count,
 			description: description,
 			pattern:     pattern,
+			lenFormat:   lenFormat,
 		}
 		// and pass them to the correct function (defined when template is called)
 		err := applyFastatsFunction(fn, a, w)
@@ -72,7 +74,7 @@ func applyFastatsFunction(fn fastatsFunction, args arguments, w io.Writer) error
 			return err
 		}
 		defer f.Close()
-		// depending on whwether the fasta file is compressed or not, provide the correct reader
+		// depending on whether the fasta file is compressed or not, provide the correct reader
 		switch filepath.Ext(args.filepath) {
 		case ".gz", ".bgz":
 			r = fasta.NewZReader(f)

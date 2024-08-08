@@ -10,7 +10,7 @@ import (
 
 func Test_length(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, false, false)
+	err := length(out, []string{}, "", false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +23,7 @@ func Test_length(t *testing.T) {
 
 func Test_lengthFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, false, false)
+	err := length(out, []string{}, "", true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,7 +37,7 @@ stdin	0
 
 func Test_lengthCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, true, false)
+	err := length(out, []string{}, "", false, true, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +50,7 @@ func Test_lengthCounts(t *testing.T) {
 
 func Test_lengthFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, true, false)
+	err := length(out, []string{}, "", true, true, false, "")
 	if err != nil {
 		t.Error(err)
 	}

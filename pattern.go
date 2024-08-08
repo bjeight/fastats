@@ -11,7 +11,7 @@ import (
 // depends on the cli arguments), then passes patternRecords() + the cli arguments + the writer to
 // collectCommandLine which processes the fasta file(s) from the command line or stdin, depending
 // on what is provided by the user.
-func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool) error {
+func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
 
 	switch {
 	case file && counts:
@@ -36,7 +36,7 @@ func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts 
 		}
 	}
 
-	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts, description)
+	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts, description, lenFormat)
 	if err != nil {
 		return err
 	}

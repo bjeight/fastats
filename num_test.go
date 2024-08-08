@@ -10,7 +10,7 @@ import (
 
 func Test_num(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, false, false)
+	err := num(out, []string{}, "", false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -24,7 +24,7 @@ stdin	0
 
 func Test_numFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, false, false)
+	err := num(out, []string{}, "", true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -38,7 +38,7 @@ stdin	0
 
 func Test_numCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, true, false)
+	err := num(out, []string{}, "", false, true, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -52,7 +52,7 @@ stdin	0
 
 func Test_numFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, true, false)
+	err := num(out, []string{}, "", true, true, false, "")
 	if err != nil {
 		t.Error(err)
 	}
