@@ -12,11 +12,13 @@ import (
 // from the command line or stdin, depending on what is provided by the user.
 func num(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
 
+	// Write the correct header for the output
 	_, err := w.Write([]byte("file\tn_records\n"))
 	if err != nil {
 		return err
 	}
 
+	// pass numRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
 	err = collectCommandLine(w, numRecords, filepaths, pattern, file, counts, description, lenFormat)
 	if err != nil {
 		return err
@@ -43,7 +45,7 @@ func numRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 		if err != nil {
 			return err
 		}
-		// for every record, += the count
+		// for every record, +1 the count
 		c_total += 1
 	}
 	// print the count

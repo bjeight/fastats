@@ -20,13 +20,13 @@ type arguments struct {
 
 type fastatsFunction func(*fasta.Reader, arguments, io.Writer) error
 
-// For every file provided on the command line, template applies the correct functionality based on the cli arguments.
+// For every file provided on the command line, collectCommandLine applies the correct functionality based on the cli arguments.
 // If no files are provided, it signals that we should try to read an uncompressed fasta file from stdin.
 func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pattern string, file bool, count bool, description bool, lenFormat string) error {
 
 	// for every file provided on the command line...
 	for _, fp := range filepaths {
-		// wrap the arguments up in s struct
+		// wrap the arguments up in a struct
 		a := arguments{
 			filepath:    fp,
 			file:        file,
@@ -35,14 +35,14 @@ func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pat
 			pattern:     pattern,
 			lenFormat:   lenFormat,
 		}
-		// and pass them to the correct function (defined when template is called)
+		// and pass them to the correct function (defined when collectCommandLine is called)
 		err := applyFastatsFunction(fn, a, w)
 		if err != nil {
 			return err
 		}
 	}
 
-	// if there were no files provided on the command line, attemp to read from stdin
+	// If there were no files provided on the command line, attempt to read from stdin
 	if len(filepaths) == 0 {
 		a := arguments{
 			filepath:    "stdin",
@@ -61,8 +61,7 @@ func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pat
 }
 
 // Given a function to apply to the fasta file and the other command line arguments,
-// open the correct file, create an appropriate reader, and apply the function (passing
-// it the command line arguments and the writer from the scope above)
+// open the correct file, create an appropriate reader, and apply the function
 func applyFastatsFunction(fn fastatsFunction, args arguments, w io.Writer) error {
 	// open stdin or a file
 	var r *fasta.Reader
@@ -88,16 +87,17 @@ func applyFastatsFunction(fn fastatsFunction, args arguments, w io.Writer) error
 		return err
 	}
 
-	return err
+	return nil
 }
 
-// Get just the filename from the path + filename
+// Get just the filename from path + filename
 func filenameFromFullPath(filepath string) string {
 	sa := strings.Split(filepath, "/")
 	return sa[len(sa)-1]
 }
 
-func return_record_name(fr fasta.FastaRecord, description bool) string {
+// Return either fasta record ID or its (full) description
+func returnRecordName(fr fasta.FastaRecord, description bool) string {
 	if description {
 		return fr.Description
 	} else {

@@ -8,7 +8,7 @@ import (
 	"io"
 )
 
-// A struct for one Fasta record
+// A struct for one fasta record
 type FastaRecord struct {
 	ID          string
 	Description string

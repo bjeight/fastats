@@ -13,6 +13,9 @@ import (
 // on what is provided by the user.
 func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
 
+	// write the correct header, depending on whether the statistics are
+	// to be calculated per record or per file, and whether they are counts
+	// or proportions
 	switch {
 	case file && counts:
 		_, err := w.Write([]byte("file\t" + pattern + "_count\n"))
@@ -36,6 +39,7 @@ func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts 
 		}
 	}
 
+	// pass patternRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
 	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts, description, lenFormat)
 	if err != nil {
 		return err
@@ -54,7 +58,7 @@ func patternRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 	// the array lookup in the next step
 	pattern_slice := []byte(args.pattern)
 
-	// initiate counts for the number of occurences of the specified patterh, and
+	// initiate counts for the number of occurrences of the specified pattern, and
 	// the length of each record
 	n_total := 0
 	l_total := 0
@@ -89,14 +93,14 @@ func patternRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 		} else {
 			// print a count or a proportion
 			if args.counts {
-				s := fmt.Sprintf("%s\t%d\n", return_record_name(record, args.description), n)
+				s := fmt.Sprintf("%s\t%d\n", returnRecordName(record, args.description), n)
 				_, err := w.Write([]byte(s))
 				if err != nil {
 					return err
 				}
 			} else {
 				proportion := float64(n) / float64(len(record.Seq))
-				s := fmt.Sprintf("%s\t%f\n", return_record_name(record, args.description), proportion)
+				s := fmt.Sprintf("%s\t%f\n", returnRecordName(record, args.description), proportion)
 				_, err := w.Write([]byte(s))
 				if err != nil {
 					return err

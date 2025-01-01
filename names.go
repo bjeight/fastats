@@ -7,9 +7,10 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-// names() is fastats names in the cli. It writes the ids / descriptions of the records
+// names() is fastats names in the cli. It writes the IDs / descriptions of the records
 func names(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
 
+	// Write the correct header for the output
 	var err error
 	if description {
 		_, err = w.Write([]byte("file\tdescription\n"))
@@ -23,6 +24,7 @@ func names(w io.Writer, filepaths []string, pattern string, file bool, counts bo
 		}
 	}
 
+	// pass namesRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
 	err = collectCommandLine(w, namesRecords, filepaths, pattern, file, counts, description, lenFormat)
 	if err != nil {
 		return err
@@ -31,6 +33,7 @@ func names(w io.Writer, filepaths []string, pattern string, file bool, counts bo
 	return nil
 }
 
+// namesRecords does the work of fastats names for one fasta file at a time.
 func namesRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 
 	// get the file name in case we need to print it to stdout
@@ -47,7 +50,7 @@ func namesRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 		}
 		// if the statistic is to be calculated per file, add this record's length
 		// to the total, else just write it.
-		s := fmt.Sprintf("%s\t%s\n", filename, return_record_name(record, args.description))
+		s := fmt.Sprintf("%s\t%s\n", filename, returnRecordName(record, args.description))
 		_, err = w.Write([]byte(s))
 		if err != nil {
 			return err

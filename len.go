@@ -14,8 +14,8 @@ import (
 // by the user.
 func length(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
 
-	// print the correct header to stdout, depending on whether the statistics are
-	// to be calculated per file or per record
+	// write the correct header, depending on whether the statistics are
+	// to be calculated per file or per record...
 	if file {
 		_, err := w.Write([]byte("file\tlength"))
 		if err != nil {
@@ -28,6 +28,7 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 		}
 	}
 
+	// ...and whether we are printing length in units other than bases
 	switch lenFormat {
 	case "kb":
 		_, err := w.Write([]byte("_kb\n"))
@@ -51,7 +52,7 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 		}
 	}
 
-	// pass lengthRecords + the cli arguments to template() for processesing the fasta file(s)
+	// pass lengthRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
 	err := collectCommandLine(w, lengthRecords, filepaths, pattern, file, counts, description, lenFormat)
 	if err != nil {
 		return err
@@ -83,7 +84,7 @@ func lengthRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 		if args.file {
 			l_total += len(record.Seq)
 		} else {
-			s := fmt.Sprintf("%s\t%s\n", return_record_name(record, args.description), return_record_length(len(record.Seq), args.lenFormat))
+			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.description), returnRecordLength(len(record.Seq), args.lenFormat))
 			_, err := w.Write([]byte(s))
 			if err != nil {
 				return err
@@ -94,7 +95,7 @@ func lengthRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 	// if the statistic is to be calculated per file, we print the total after all
 	// the records have been processed
 	if args.file {
-		s := fmt.Sprintf("%s\t%s\n", filename, return_record_length(l_total, args.lenFormat))
+		s := fmt.Sprintf("%s\t%s\n", filename, returnRecordLength(l_total, args.lenFormat))
 		_, err := w.Write([]byte(s))
 		if err != nil {
 			return err
@@ -104,7 +105,8 @@ func lengthRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 	return nil
 }
 
-func return_record_length(l int, unit string) string {
+// returnRecordLength (potentially) converts bases to kb, mb, gb.
+func returnRecordLength(l int, unit string) string {
 	var s string
 	switch unit {
 	case "kb":
