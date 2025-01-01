@@ -85,7 +85,7 @@ Available Commands:
   n           N content
   names       Record names
   num         Number of records
-  pattern     Arbitrary PATTERN content
+  pattern     Arbitrary base content
   soft        Softmasked content
 
 Flags:

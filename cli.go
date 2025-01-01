@@ -12,7 +12,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.7.0",
+		Version:           "0.7.1",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -24,17 +24,19 @@ func main() {
 	}
 }
 
-var f bool
-var c bool
-var d bool
+var (
+	f bool
+	c bool
+	d bool
 
-var p string
+	p string
 
-var kb bool
-var mb bool
-var gb bool
+	kb bool
+	mb bool
+	gb bool
 
-var lenFormat string
+	lenFormat string
+)
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -58,9 +60,9 @@ func init() {
 
 	patternCmd.Flags().StringVarP(&p, "pattern", "p", "", "arbitrary pattern to parse")
 
-	lenCmd.Flags().BoolVarP(&kb, "kb", "", false, "print length in kilobases")
-	lenCmd.Flags().BoolVarP(&mb, "mb", "", false, "print length in megabases")
-	lenCmd.Flags().BoolVarP(&gb, "gb", "", false, "print length in gigabases")
+	lenCmd.Flags().BoolVarP(&kb, "kb", "", false, "print sequence length in kilobases")
+	lenCmd.Flags().BoolVarP(&mb, "mb", "", false, "print sequence length in megabases")
+	lenCmd.Flags().BoolVarP(&gb, "gb", "", false, "print sequence length in gigabases")
 
 	lenCmd.Flags().Lookup("kb").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("mb").NoOptDefVal = "true"
@@ -131,7 +133,7 @@ var patternCmd = &cobra.Command{
 	Use: "pattern -p PATTERN <infile[s]>",
 	Long: `e.g. fastats pattern -p AG <infile[s]>
 `,
-	Short:                 "Arbitrary PATTERN content",
+	Short:                 "Arbitrary base content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		err = pattern(os.Stdout, args, p, f, c, d, lenFormat)
