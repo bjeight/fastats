@@ -73,12 +73,27 @@ func init() {
 	lenCmd.Flags().Lookup("gb").NoOptDefVal = "true"
 }
 
+func collectCommandLine(files []string, pattern string, file, count, description, filenames bool) arguments {
+	a := arguments{
+		pattern:     pattern,
+		file:        file,
+		counts:      count,
+		description: description,
+		filenames:   filenames,
+	}
+	if len(files) > 1 {
+		a.filenames = true
+	}
+	return a
+}
+
 var atCmd = &cobra.Command{
 	Use:                   "at <infile[s]>",
 	Short:                 "AT content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "ATat", f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, "ATat", f, c, d, fn)
+		err = pattern(files, args, os.Stdout)
 		return err
 	},
 }
@@ -87,8 +102,9 @@ var gcCmd = &cobra.Command{
 	Use:                   "gc <infile[s]>",
 	Short:                 "GC content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "GCgc", f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, "GCgc", f, c, d, fn)
+		err = pattern(files, args, os.Stdout)
 		return err
 	},
 }
@@ -97,8 +113,9 @@ var atgcCmd = &cobra.Command{
 	Use:                   "atgc <infile[s]>",
 	Short:                 "ATGC content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "ATGCatgc", f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, "ATGCatgc", f, c, d, fn)
+		err = pattern(files, args, os.Stdout)
 		return err
 	},
 }
@@ -107,8 +124,9 @@ var nCmd = &cobra.Command{
 	Use:                   "n <infile[s]>",
 	Short:                 "N content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "Nn", f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, "Nn", f, c, d, fn)
+		err = pattern(files, args, os.Stdout)
 		return err
 	},
 }
@@ -117,8 +135,9 @@ var gapCmd = &cobra.Command{
 	Use:                   "gaps <infile[s]>",
 	Short:                 "Gap content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "-", f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, "-", f, c, d, fn)
+		err = pattern(files, args, os.Stdout)
 		return err
 	},
 }
@@ -127,8 +146,9 @@ var softCmd = &cobra.Command{
 	Use:                   "soft <infile[s]>",
 	Short:                 "Softmasked content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "atgcn", f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, "atgcn", f, c, d, fn)
+		err = pattern(files, args, os.Stdout)
 		return err
 	},
 }
@@ -139,8 +159,9 @@ var patternCmd = &cobra.Command{
 `,
 	Short:                 "Arbitrary base content",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, p, f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, p, f, c, d, fn)
+		err = pattern(files, args, os.Stdout)
 		return err
 	},
 }
@@ -149,8 +170,8 @@ var lenCmd = &cobra.Command{
 	Use:                   "len <infile[s]>",
 	Short:                 "Sequence length",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, p, f, c, d, fn)
 		var (
 			formatCount int
 		)
@@ -169,7 +190,8 @@ var lenCmd = &cobra.Command{
 		if formatCount > 1 {
 			return errors.New("Choose one of --kb, --mb, or --gb")
 		}
-		err = length(os.Stdout, args, p, f, c, d, fn, lenFormat)
+		args.lenFormat = lenFormat
+		err = length(files, args, os.Stdout)
 		return err
 	},
 }
@@ -178,8 +200,9 @@ var numCmd = &cobra.Command{
 	Use:                   "num <infile[s]>",
 	Short:                 "Number of records",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = num(os.Stdout, args, p, f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, p, f, c, d, fn)
+		err = num(files, args, os.Stdout)
 		return err
 	},
 }
@@ -188,8 +211,9 @@ var nameCmd = &cobra.Command{
 	Use:                   "names <infile[s]>",
 	Short:                 "Record names",
 	DisableFlagsInUseLine: true,
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = names(os.Stdout, args, p, f, c, d, fn, lenFormat)
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		args := collectCommandLine(files, p, f, c, d, fn)
+		err = names(files, args, os.Stdout)
 		return err
 	},
 }

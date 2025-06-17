@@ -10,7 +10,9 @@ import (
 
 func Test_length(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, false, false, false, "")
+	err := length([]string{}, arguments{
+		file: false, counts: false, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +25,9 @@ func Test_length(t *testing.T) {
 
 func Test_lengthFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, false, false, false, "")
+	err := length([]string{}, arguments{
+		file: true, counts: false, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,7 +41,9 @@ stdin	0
 
 func Test_lengthFilenames(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, false, false, true, "")
+	err := length([]string{}, arguments{
+		file: false, counts: false, description: false, filenames: true,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +56,9 @@ func Test_lengthFilenames(t *testing.T) {
 
 func Test_lengthFileFilenames(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, false, false, true, "")
+	err := length([]string{}, arguments{
+		file: true, counts: false, description: false, filenames: true,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,7 +72,9 @@ stdin	0
 
 func Test_lengthCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, true, false, false, "")
+	err := length([]string{}, arguments{
+		file: false, counts: true, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -77,7 +87,9 @@ func Test_lengthCounts(t *testing.T) {
 
 func Test_lengthFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, true, false, false, "")
+	err := length([]string{}, arguments{
+		file: true, counts: true, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -105,9 +117,9 @@ ATGN
 	out := new(bytes.Buffer)
 
 	lengthRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      false,
 			description: false,
@@ -143,9 +155,9 @@ ATGN
 	out := new(bytes.Buffer)
 
 	lengthRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        true,
 			counts:      false,
 			description: false,

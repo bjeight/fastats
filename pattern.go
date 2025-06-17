@@ -11,37 +11,36 @@ import (
 // depends on the cli arguments), then passes patternRecords() + the cli arguments + the writer to
 // collectCommandLine which processes the fasta file(s) from the command line or stdin, depending
 // on what is provided by the user.
-func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, filenames bool, lenFormat string) error {
+func pattern(filepaths []string, args arguments, w io.Writer) error {
 
 	// write the correct header, depending on whether the statistics are
 	// to be calculated per record or per file, and whether they are counts
 	// or proportions
-	if file || filenames {
+	if args.file || args.filenames {
 		_, err := w.Write([]byte("file\t"))
 		if err != nil {
 			return err
 		}
 	}
-	if !file {
+	if !args.file {
 		_, err := w.Write([]byte("record\t"))
 		if err != nil {
 			return err
 		}
 	}
-	if counts {
-		_, err := w.Write([]byte(pattern + "_count\n"))
+	if args.counts {
+		_, err := w.Write([]byte(args.pattern + "_count\n"))
 		if err != nil {
 			return err
 		}
 	} else {
-		_, err := w.Write([]byte(pattern + "_prop\n"))
+		_, err := w.Write([]byte(args.pattern + "_prop\n"))
 		if err != nil {
 			return err
 		}
 	}
 
-	// pass patternRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts, description, filenames, lenFormat)
+	err := applyFastatsFunction(filepaths, patternRecords, args, w)
 	if err != nil {
 		return err
 	}
@@ -50,10 +49,7 @@ func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts 
 }
 
 // patternRecords does the work of fastats at, gc, etc. for one fasta file at a time.
-func patternRecords(r *fasta.Reader, args arguments, w io.Writer) error {
-
-	// get the file name in case we need to print it to stdout
-	filename := filenameFromFullPath(args.filepath)
+func patternRecords(filename string, r *fasta.Reader, args arguments, w io.Writer) error {
 
 	// we need the pattern to be counted as a slice of bytes so that we can perform
 	// the array lookup in the next step

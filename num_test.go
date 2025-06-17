@@ -10,7 +10,9 @@ import (
 
 func Test_num(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, false, false, false, "")
+	err := num([]string{"stdin"}, arguments{
+		file: false, counts: false, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -24,7 +26,9 @@ stdin	0
 
 func Test_numFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, false, false, false, "")
+	err := num([]string{"stdin"}, arguments{
+		file: true, counts: false, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -38,7 +42,9 @@ stdin	0
 
 func Test_numFilenames(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, false, false, true, "")
+	err := num([]string{}, arguments{
+		file: false, counts: false, description: false, filenames: true,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -52,7 +58,9 @@ stdin	0
 
 func Test_numFileFilenames(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, false, false, true, "")
+	err := num([]string{}, arguments{
+		file: true, counts: false, description: false, filenames: true,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -66,7 +74,9 @@ stdin	0
 
 func Test_numCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, true, false, false, "")
+	err := num([]string{}, arguments{
+		file: false, counts: true, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -80,7 +90,9 @@ stdin	0
 
 func Test_numFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, true, false, false, "")
+	err := num([]string{}, arguments{
+		file: true, counts: true, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -108,9 +120,9 @@ ATGN
 	out := new(bytes.Buffer)
 
 	numRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      false,
 			description: false,

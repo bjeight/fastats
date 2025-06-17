@@ -10,7 +10,9 @@ import (
 
 func Test_pattern(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, false, false, false, "")
+	err := pattern([]string{}, arguments{
+		pattern: "ATat", file: false, counts: false, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +25,9 @@ func Test_pattern(t *testing.T) {
 
 func Test_patternFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, false, false, false, "")
+	err := pattern([]string{}, arguments{
+		pattern: "ATat", file: true, counts: false, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,7 +41,9 @@ stdin	NaN
 
 func Test_patternFilenames(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, false, false, true, "")
+	err := pattern([]string{}, arguments{
+		pattern: "ATat", file: false, counts: false, description: false, filenames: true,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +56,9 @@ func Test_patternFilenames(t *testing.T) {
 
 func Test_patternFileFilenames(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, false, false, true, "")
+	err := pattern([]string{}, arguments{
+		pattern: "ATat", file: true, counts: false, description: false, filenames: true,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,7 +72,9 @@ stdin	NaN
 
 func Test_patternCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, true, false, false, "")
+	err := pattern([]string{}, arguments{
+		pattern: "ATat", file: false, counts: true, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -77,7 +87,9 @@ func Test_patternCounts(t *testing.T) {
 
 func Test_patternFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, true, false, false, "")
+	err := pattern([]string{}, arguments{
+		pattern: "ATat", file: true, counts: true, description: false, filenames: false,
+	}, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -105,9 +117,9 @@ AT
 	out := new(bytes.Buffer)
 
 	patternRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      false,
 			description: false,
@@ -144,9 +156,9 @@ AT
 	out := new(bytes.Buffer)
 
 	patternRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      false,
 			description: false,
@@ -183,9 +195,9 @@ ATGC
 	out := new(bytes.Buffer)
 
 	patternRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        true,
 			counts:      false,
 			description: false,
@@ -220,9 +232,9 @@ AT
 	out := new(bytes.Buffer)
 
 	patternRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      true,
 			description: false,
@@ -259,9 +271,9 @@ AT
 	out := new(bytes.Buffer)
 
 	patternRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      true,
 			description: false,
@@ -298,9 +310,9 @@ AT
 	out := new(bytes.Buffer)
 
 	patternRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        true,
 			counts:      true,
 			description: false,
@@ -335,9 +347,9 @@ AT
 	out := new(bytes.Buffer)
 
 	patternRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        true,
 			counts:      true,
 			description: false,

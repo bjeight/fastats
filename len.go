@@ -12,16 +12,16 @@ import (
 // arguments), then passes lengthRecords() + the cli arguments + the writer to collectCommandLine,
 // which processes the fasta file(s) from the command line or stdin, depending on what is provided
 // by the user.
-func length(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, filenames bool, lenFormat string) error {
+func length(filepaths []string, args arguments, w io.Writer) error {
 
 	// write the correct header, depending on whether the statistics are
 	// to be calculated per file or per record...
-	if file {
+	if args.file {
 		_, err := w.Write([]byte("file\tlength"))
 		if err != nil {
 			return err
 		}
-	} else if !filenames {
+	} else if !args.filenames {
 		_, err := w.Write([]byte("record\tlength"))
 		if err != nil {
 			return err
@@ -34,7 +34,7 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 	}
 
 	// ...and whether we are printing length in units other than bases
-	switch lenFormat {
+	switch args.lenFormat {
 	case "kb":
 		_, err := w.Write([]byte("_kb\n"))
 		if err != nil {
@@ -57,8 +57,7 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 		}
 	}
 
-	// pass lengthRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err := collectCommandLine(w, lengthRecords, filepaths, pattern, file, counts, description, filenames, lenFormat)
+	err := applyFastatsFunction(filepaths, lengthRecords, args, w)
 	if err != nil {
 		return err
 	}
@@ -67,10 +66,7 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 }
 
 // lengthRecords does the work of fastats len for one fasta file at a time.
-func lengthRecords(r *fasta.Reader, args arguments, w io.Writer) error {
-
-	// get the file name in case we need to print it to stdout
-	filename := filenameFromFullPath(args.filepath)
+func lengthRecords(filename string, r *fasta.Reader, args arguments, w io.Writer) error {
 
 	// initiate a count for the length of each record
 	l_total := 0

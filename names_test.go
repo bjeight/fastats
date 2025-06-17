@@ -24,9 +24,9 @@ ATGN
 	out := new(bytes.Buffer)
 
 	namesRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      false,
 			description: false,
@@ -53,9 +53,9 @@ myfile.fasta	seq3
 	out = new(bytes.Buffer)
 
 	namesRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      false,
 			description: true,
@@ -82,9 +82,9 @@ myfile.fasta	seq3
 	out = new(bytes.Buffer)
 
 	namesRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        false,
 			counts:      false,
 			description: true,
@@ -111,9 +111,9 @@ myfile.fasta	seq3
 	out = new(bytes.Buffer)
 
 	namesRecords(
+		"myfile.fasta",
 		r,
 		arguments{
-			filepath:    "/path/to/myfile.fasta",
 			file:        true,
 			counts:      false,
 			description: true,

@@ -8,11 +8,11 @@ import (
 )
 
 // names() is fastats names in the cli. It writes the IDs / descriptions of the records
-func names(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, filenames bool, lenFormat string) error {
+func names(filepaths []string, args arguments, w io.Writer) error {
 
 	// Write the correct header for the output
 	var err error
-	if description {
+	if args.description {
 		_, err = w.Write([]byte("file\tdescription\n"))
 		if err != nil {
 			return err
@@ -25,7 +25,7 @@ func names(w io.Writer, filepaths []string, pattern string, file bool, counts bo
 	}
 
 	// pass namesRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err = collectCommandLine(w, namesRecords, filepaths, pattern, file, counts, description, filenames, lenFormat)
+	err = applyFastatsFunction(filepaths, namesRecords, args, w)
 	if err != nil {
 		return err
 	}
@@ -34,10 +34,7 @@ func names(w io.Writer, filepaths []string, pattern string, file bool, counts bo
 }
 
 // namesRecords does the work of fastats names for one fasta file at a time.
-func namesRecords(r *fasta.Reader, args arguments, w io.Writer) error {
-
-	// get the file name in case we need to print it to stdout
-	filename := filenameFromFullPath(args.filepath)
+func namesRecords(filename string, r *fasta.Reader, args arguments, w io.Writer) error {
 
 	// iterate over every record in the fasta file
 	for {
