@@ -10,7 +10,7 @@ import (
 // num() is fastats num in the cli. It writes the header, then passes numRecords() + the
 // cli arguments + the writer to collectCommandLine, which processes the fasta file(s)
 // from the command line or stdin, depending on what is provided by the user.
-func num(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
+func num(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, filenames bool, lenFormat string) error {
 
 	// Write the correct header for the output
 	_, err := w.Write([]byte("file\tn_records\n"))
@@ -19,7 +19,7 @@ func num(w io.Writer, filepaths []string, pattern string, file bool, counts bool
 	}
 
 	// pass numRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err = collectCommandLine(w, numRecords, filepaths, pattern, file, counts, description, lenFormat)
+	err = collectCommandLine(w, numRecords, filepaths, pattern, file, counts, description, filenames, lenFormat)
 	if err != nil {
 		return err
 	}

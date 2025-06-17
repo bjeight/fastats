@@ -12,7 +12,7 @@ import (
 // arguments), then passes lengthRecords() + the cli arguments + the writer to collectCommandLine,
 // which processes the fasta file(s) from the command line or stdin, depending on what is provided
 // by the user.
-func length(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
+func length(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, filenames bool, lenFormat string) error {
 
 	// write the correct header, depending on whether the statistics are
 	// to be calculated per file or per record...
@@ -21,8 +21,13 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 		if err != nil {
 			return err
 		}
-	} else {
+	} else if !filenames {
 		_, err := w.Write([]byte("record\tlength"))
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err := w.Write([]byte("file\trecord\tlength"))
 		if err != nil {
 			return err
 		}
@@ -53,7 +58,7 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 	}
 
 	// pass lengthRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err := collectCommandLine(w, lengthRecords, filepaths, pattern, file, counts, description, lenFormat)
+	err := collectCommandLine(w, lengthRecords, filepaths, pattern, file, counts, description, filenames, lenFormat)
 	if err != nil {
 		return err
 	}
@@ -84,6 +89,9 @@ func lengthRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 		if args.file {
 			l_total += len(record.Seq)
 		} else {
+			if args.filenames {
+				w.Write([]byte(filename + "\t"))
+			}
 			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.description), returnRecordLength(len(record.Seq), args.lenFormat))
 			_, err := w.Write([]byte(s))
 			if err != nil {

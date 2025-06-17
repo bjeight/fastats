@@ -30,6 +30,7 @@ ATGN
 			file:        false,
 			counts:      false,
 			description: false,
+			filenames:   false,
 			pattern:     "",
 		},
 		out,
@@ -45,6 +46,8 @@ myfile.fasta	seq3
 		t.Errorf("problem in Test_names (id)")
 	}
 
+	//
+
 	fastaR = bytes.NewReader(fastaData)
 	r = fasta.NewReader(fastaR)
 	out = new(bytes.Buffer)
@@ -56,6 +59,65 @@ myfile.fasta	seq3
 			file:        false,
 			counts:      false,
 			description: true,
+			filenames:   false,
+			pattern:     "",
+		},
+		out,
+	)
+
+	desiredResult = `myfile.fasta	seq1 is cool
+myfile.fasta	seq2 is cool too
+myfile.fasta	seq3
+`
+
+	if out.String() != desiredResult {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_names (description)")
+	}
+
+	//
+
+	fastaR = bytes.NewReader(fastaData)
+	r = fasta.NewReader(fastaR)
+	out = new(bytes.Buffer)
+
+	namesRecords(
+		r,
+		arguments{
+			filepath:    "/path/to/myfile.fasta",
+			file:        false,
+			counts:      false,
+			description: true,
+			filenames:   true,
+			pattern:     "",
+		},
+		out,
+	)
+
+	desiredResult = `myfile.fasta	seq1 is cool
+myfile.fasta	seq2 is cool too
+myfile.fasta	seq3
+`
+
+	if out.String() != desiredResult {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_names (description)")
+	}
+
+	//
+
+	fastaR = bytes.NewReader(fastaData)
+	r = fasta.NewReader(fastaR)
+	out = new(bytes.Buffer)
+
+	namesRecords(
+		r,
+		arguments{
+			filepath:    "/path/to/myfile.fasta",
+			file:        true,
+			counts:      false,
+			description: true,
+			filenames:   true,
 			pattern:     "",
 		},
 		out,

@@ -14,6 +14,7 @@ type arguments struct {
 	file        bool
 	counts      bool
 	description bool
+	filenames   bool
 	pattern     string
 	lenFormat   string
 }
@@ -22,7 +23,7 @@ type fastatsFunction func(*fasta.Reader, arguments, io.Writer) error
 
 // For every file provided on the command line, collectCommandLine applies the correct functionality based on the cli arguments.
 // If no files are provided, it signals that we should try to read an uncompressed fasta file from stdin.
-func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pattern string, file bool, count bool, description bool, lenFormat string) error {
+func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pattern string, file bool, count bool, description bool, filenames bool, lenFormat string) error {
 
 	// for every file provided on the command line...
 	for _, fp := range filepaths {
@@ -32,6 +33,7 @@ func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pat
 			file:        file,
 			counts:      count,
 			description: description,
+			filenames:   filenames,
 			pattern:     pattern,
 			lenFormat:   lenFormat,
 		}
@@ -48,8 +50,10 @@ func collectCommandLine(w io.Writer, fn fastatsFunction, filepaths []string, pat
 			filepath:    "stdin",
 			file:        file,
 			counts:      count,
-			pattern:     pattern,
 			description: description,
+			filenames:   filenames,
+			pattern:     pattern,
+			lenFormat:   lenFormat,
 		}
 		err := applyFastatsFunction(fn, a, w)
 		if err != nil {

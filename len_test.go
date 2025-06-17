@@ -10,7 +10,7 @@ import (
 
 func Test_length(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, false, false, "")
+	err := length(out, []string{}, "", false, false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +23,7 @@ func Test_length(t *testing.T) {
 
 func Test_lengthFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, false, false, "")
+	err := length(out, []string{}, "", true, false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,9 +35,36 @@ stdin	0
 	}
 }
 
+func Test_lengthFilenames(t *testing.T) {
+	out := new(bytes.Buffer)
+	err := length(out, []string{}, "", false, false, false, true, "")
+	if err != nil {
+		t.Error(err)
+	}
+	if out.String() != `file	record	length
+` {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_lengthFilenames")
+	}
+}
+
+func Test_lengthFileFilenames(t *testing.T) {
+	out := new(bytes.Buffer)
+	err := length(out, []string{}, "", true, false, false, true, "")
+	if err != nil {
+		t.Error(err)
+	}
+	if out.String() != `file	length
+stdin	0
+` {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_lengthFileFilenames")
+	}
+}
+
 func Test_lengthCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", false, true, false, "")
+	err := length(out, []string{}, "", false, true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +77,7 @@ func Test_lengthCounts(t *testing.T) {
 
 func Test_lengthFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := length(out, []string{}, "", true, true, false, "")
+	err := length(out, []string{}, "", true, true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}

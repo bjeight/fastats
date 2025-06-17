@@ -8,7 +8,7 @@ import (
 )
 
 // names() is fastats names in the cli. It writes the IDs / descriptions of the records
-func names(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
+func names(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, filenames bool, lenFormat string) error {
 
 	// Write the correct header for the output
 	var err error
@@ -25,7 +25,7 @@ func names(w io.Writer, filepaths []string, pattern string, file bool, counts bo
 	}
 
 	// pass namesRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err = collectCommandLine(w, namesRecords, filepaths, pattern, file, counts, description, lenFormat)
+	err = collectCommandLine(w, namesRecords, filepaths, pattern, file, counts, description, filenames, lenFormat)
 	if err != nil {
 		return err
 	}

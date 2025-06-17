@@ -10,7 +10,7 @@ import (
 
 func Test_num(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, false, false, "")
+	err := num(out, []string{}, "", false, false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -24,7 +24,7 @@ stdin	0
 
 func Test_numFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, false, false, "")
+	err := num(out, []string{}, "", true, false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -36,9 +36,37 @@ stdin	0
 	}
 }
 
+func Test_numFilenames(t *testing.T) {
+	out := new(bytes.Buffer)
+	err := num(out, []string{}, "", false, false, false, true, "")
+	if err != nil {
+		t.Error(err)
+	}
+	if out.String() != `file	n_records
+stdin	0
+` {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_numFilenames")
+	}
+}
+
+func Test_numFileFilenames(t *testing.T) {
+	out := new(bytes.Buffer)
+	err := num(out, []string{}, "", true, false, false, true, "")
+	if err != nil {
+		t.Error(err)
+	}
+	if out.String() != `file	n_records
+stdin	0
+` {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_numFileFilenames")
+	}
+}
+
 func Test_numCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", false, true, false, "")
+	err := num(out, []string{}, "", false, true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -52,7 +80,7 @@ stdin	0
 
 func Test_numFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := num(out, []string{}, "", true, true, false, "")
+	err := num(out, []string{}, "", true, true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}

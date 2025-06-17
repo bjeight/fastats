@@ -12,7 +12,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.7.1",
+		Version:           "0.8.0",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -29,6 +29,8 @@ var (
 	c bool
 	d bool
 
+	fn bool
+
 	p string
 
 	kb bool
@@ -42,10 +44,12 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
 	rootCmd.PersistentFlags().BoolVarP(&c, "count", "c", false, "print counts (default is proportions)")
 	rootCmd.PersistentFlags().BoolVarP(&d, "description", "d", false, "write record descriptions (default is IDs)")
+	rootCmd.PersistentFlags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
 
 	rootCmd.PersistentFlags().Lookup("file").NoOptDefVal = "true"
 	rootCmd.PersistentFlags().Lookup("count").NoOptDefVal = "true"
 	rootCmd.PersistentFlags().Lookup("description").NoOptDefVal = "true"
+	rootCmd.PersistentFlags().Lookup("fn").NoOptDefVal = "true"
 
 	rootCmd.AddCommand(atCmd)
 	rootCmd.AddCommand(gcCmd)
@@ -74,7 +78,7 @@ var atCmd = &cobra.Command{
 	Short:                 "AT content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "ATat", f, c, d, lenFormat)
+		err = pattern(os.Stdout, args, "ATat", f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -84,7 +88,7 @@ var gcCmd = &cobra.Command{
 	Short:                 "GC content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "GCgc", f, c, d, lenFormat)
+		err = pattern(os.Stdout, args, "GCgc", f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -94,7 +98,7 @@ var atgcCmd = &cobra.Command{
 	Short:                 "ATGC content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "ATGCatgc", f, c, d, lenFormat)
+		err = pattern(os.Stdout, args, "ATGCatgc", f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -104,7 +108,7 @@ var nCmd = &cobra.Command{
 	Short:                 "N content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "Nn", f, c, d, lenFormat)
+		err = pattern(os.Stdout, args, "Nn", f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -114,7 +118,7 @@ var gapCmd = &cobra.Command{
 	Short:                 "Gap content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "-", f, c, d, lenFormat)
+		err = pattern(os.Stdout, args, "-", f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -124,7 +128,7 @@ var softCmd = &cobra.Command{
 	Short:                 "Softmasked content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, "atgcn", f, c, d, lenFormat)
+		err = pattern(os.Stdout, args, "atgcn", f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -136,7 +140,7 @@ var patternCmd = &cobra.Command{
 	Short:                 "Arbitrary base content",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = pattern(os.Stdout, args, p, f, c, d, lenFormat)
+		err = pattern(os.Stdout, args, p, f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -165,7 +169,7 @@ var lenCmd = &cobra.Command{
 		if formatCount > 1 {
 			return errors.New("Choose one of --kb, --mb, or --gb")
 		}
-		err = length(os.Stdout, args, p, f, c, d, lenFormat)
+		err = length(os.Stdout, args, p, f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -175,7 +179,7 @@ var numCmd = &cobra.Command{
 	Short:                 "Number of records",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = num(os.Stdout, args, p, f, c, d, lenFormat)
+		err = num(os.Stdout, args, p, f, c, d, fn, lenFormat)
 		return err
 	},
 }
@@ -185,7 +189,7 @@ var nameCmd = &cobra.Command{
 	Short:                 "Record names",
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = names(os.Stdout, args, p, f, c, d, lenFormat)
+		err = names(os.Stdout, args, p, f, c, d, fn, lenFormat)
 		return err
 	},
 }

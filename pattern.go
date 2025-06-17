@@ -11,36 +11,37 @@ import (
 // depends on the cli arguments), then passes patternRecords() + the cli arguments + the writer to
 // collectCommandLine which processes the fasta file(s) from the command line or stdin, depending
 // on what is provided by the user.
-func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
+func pattern(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, filenames bool, lenFormat string) error {
 
 	// write the correct header, depending on whether the statistics are
 	// to be calculated per record or per file, and whether they are counts
 	// or proportions
-	switch {
-	case file && counts:
-		_, err := w.Write([]byte("file\t" + pattern + "_count\n"))
+	if file || filenames {
+		_, err := w.Write([]byte("file\t"))
 		if err != nil {
 			return err
 		}
-	case file && !counts:
-		_, err := w.Write([]byte("file\t" + pattern + "_prop\n"))
+	}
+	if !file {
+		_, err := w.Write([]byte("record\t"))
 		if err != nil {
 			return err
 		}
-	case !file && counts:
-		_, err := w.Write([]byte("record\t" + pattern + "_count\n"))
+	}
+	if counts {
+		_, err := w.Write([]byte(pattern + "_count\n"))
 		if err != nil {
 			return err
 		}
-	case !file && !counts:
-		_, err := w.Write([]byte("record\t" + pattern + "_prop\n"))
+	} else {
+		_, err := w.Write([]byte(pattern + "_prop\n"))
 		if err != nil {
 			return err
 		}
 	}
 
 	// pass patternRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts, description, lenFormat)
+	err := collectCommandLine(w, patternRecords, filepaths, pattern, file, counts, description, filenames, lenFormat)
 	if err != nil {
 		return err
 	}
@@ -91,6 +92,9 @@ func patternRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 			n_total += n
 			l_total += len(record.Seq)
 		} else {
+			if args.filenames {
+				w.Write([]byte(filename + "\t"))
+			}
 			// print a count or a proportion
 			if args.counts {
 				s := fmt.Sprintf("%s\t%d\n", returnRecordName(record, args.description), n)

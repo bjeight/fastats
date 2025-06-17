@@ -10,7 +10,7 @@ import (
 
 func Test_pattern(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, false, false, "")
+	err := pattern(out, []string{}, "ATat", false, false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +23,7 @@ func Test_pattern(t *testing.T) {
 
 func Test_patternFile(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, false, false, "")
+	err := pattern(out, []string{}, "ATat", true, false, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,9 +35,36 @@ stdin	NaN
 	}
 }
 
+func Test_patternFilenames(t *testing.T) {
+	out := new(bytes.Buffer)
+	err := pattern(out, []string{}, "ATat", false, false, false, true, "")
+	if err != nil {
+		t.Error(err)
+	}
+	if out.String() != `file	record	ATat_prop
+` {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_patternFilenames")
+	}
+}
+
+func Test_patternFileFilenames(t *testing.T) {
+	out := new(bytes.Buffer)
+	err := pattern(out, []string{}, "ATat", true, false, false, true, "")
+	if err != nil {
+		t.Error(err)
+	}
+	if out.String() != `file	ATat_prop
+stdin	NaN
+` {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_patternFilenames")
+	}
+}
+
 func Test_patternCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", false, true, false, "")
+	err := pattern(out, []string{}, "ATat", false, true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +77,7 @@ func Test_patternCounts(t *testing.T) {
 
 func Test_patternFileCounts(t *testing.T) {
 	out := new(bytes.Buffer)
-	err := pattern(out, []string{}, "ATat", true, true, false, "")
+	err := pattern(out, []string{}, "ATat", true, true, false, false, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -84,6 +111,7 @@ AT
 			file:        false,
 			counts:      false,
 			description: false,
+			filenames:   false,
 			pattern:     "ATat",
 		},
 		out,
@@ -122,6 +150,7 @@ AT
 			file:        false,
 			counts:      false,
 			description: false,
+			filenames:   false,
 			pattern:     "GCgc",
 		},
 		out,
@@ -160,6 +189,7 @@ ATGC
 			file:        true,
 			counts:      false,
 			description: false,
+			filenames:   false,
 			pattern:     "ATat",
 		},
 		out,
@@ -196,6 +226,7 @@ AT
 			file:        false,
 			counts:      true,
 			description: false,
+			filenames:   false,
 			pattern:     "ATat",
 		},
 		out,
@@ -204,6 +235,45 @@ AT
 	desiredResult := `seq1	2
 seq2	10
 seq3	2
+`
+
+	if out.String() != desiredResult {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_patternRecordsATCount")
+	}
+}
+
+func Test_patternFilenameRecordsATCount(t *testing.T) {
+	fastaData := []byte(
+		`>seq1
+ATGC
+>seq2
+ATG-ATG-
+ATGCATGC
+ATGC
+>seq3
+AT
+`)
+	fastaR := bytes.NewReader(fastaData)
+	r := fasta.NewReader(fastaR)
+	out := new(bytes.Buffer)
+
+	patternRecords(
+		r,
+		arguments{
+			filepath:    "/path/to/myfile.fasta",
+			file:        false,
+			counts:      true,
+			description: false,
+			filenames:   true,
+			pattern:     "ATat",
+		},
+		out,
+	)
+
+	desiredResult := `myfile.fasta	seq1	2
+myfile.fasta	seq2	10
+myfile.fasta	seq3	2
 `
 
 	if out.String() != desiredResult {
@@ -234,6 +304,44 @@ AT
 			file:        true,
 			counts:      true,
 			description: false,
+			filenames:   false,
+			pattern:     "ATat",
+		},
+		out,
+	)
+
+	desiredResult := `myfile.fasta	14
+`
+
+	if out.String() != desiredResult {
+		fmt.Println(out.String())
+		t.Errorf("problem in Test_patternRecordsATFileCount")
+	}
+}
+
+func Test_patternRecordsATFileFilenameCount(t *testing.T) {
+	fastaData := []byte(
+		`>seq1
+ATGC
+>seq2
+ATG-ATG-
+ATGCATGC
+ATGC
+>seq3
+AT
+`)
+	fastaR := bytes.NewReader(fastaData)
+	r := fasta.NewReader(fastaR)
+	out := new(bytes.Buffer)
+
+	patternRecords(
+		r,
+		arguments{
+			filepath:    "/path/to/myfile.fasta",
+			file:        true,
+			counts:      true,
+			description: false,
+			filenames:   true,
 			pattern:     "ATat",
 		},
 		out,
