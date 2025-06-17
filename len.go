@@ -9,8 +9,7 @@ import (
 )
 
 // length() is fastats len in the cli. It writes the appropriate header (which depends on the cli
-// arguments), then passes lengthRecords() + the cli arguments + the writer to collectCommandLine,
-// which processes the fasta file(s) from the command line or stdin, depending on what is provided
+// arguments), then processes the fasta file(s) from the command line or stdin, depending on what is provided
 // by the user.
 func length(filepaths []string, args arguments, w io.Writer) error {
 

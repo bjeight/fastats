@@ -7,8 +7,7 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-// num() is fastats num in the cli. It writes the header, then passes numRecords() + the
-// cli arguments + the writer to collectCommandLine, which processes the fasta file(s)
+// num() is fastats num in the cli. It writes the header, then processes the fasta file(s)
 // from the command line or stdin, depending on what is provided by the user.
 func num(filepaths []string, args arguments, w io.Writer) error {
 

@@ -8,8 +8,7 @@ import (
 )
 
 // pattern() is fastats at, gc, gaps etc. in the cli. It writes the appropriate header (which
-// depends on the cli arguments), then passes patternRecords() + the cli arguments + the writer to
-// collectCommandLine which processes the fasta file(s) from the command line or stdin, depending
+// depends on the cli arguments), then processes the fasta file(s) from the command line or stdin, depending
 // on what is provided by the user.
 func pattern(filepaths []string, args arguments, w io.Writer) error {
 
