@@ -135,14 +135,15 @@ ATTAT-
 	desiredResult := `Seq1	0.666667
 Seq2	0.833333
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := patternRecords("stdin", reader, p)
+	err := patternRecords("stdin", reader, p, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -164,14 +165,15 @@ ATTAT-
 	desiredResult := `Seq1	0.333333
 Seq2	0.000000
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := patternRecords("stdin", reader, p)
+	err := patternRecords("stdin", reader, p, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -192,14 +194,15 @@ ATTAT-
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
 	desiredResult := `stdin	0.750000
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := patternRecords("stdin", reader, p)
+	err := patternRecords("stdin", reader, p, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -221,14 +224,15 @@ ATTAT-
 	desiredResult := `Seq1	4
 Seq2	5
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := patternRecords("stdin", reader, p)
+	err := patternRecords("stdin", reader, p, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -249,14 +253,15 @@ ATTAT-
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
 	desiredResult := `stdin	9
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := patternRecords("stdin", reader, p)
+	err := patternRecords("stdin", reader, p, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -278,14 +283,15 @@ ATTAT-
 	desiredResult := `my.fasta	Seq1	4
 my.fasta	Seq2	5
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := patternRecords("/path/to/my.fasta", reader, p)
+	err := patternRecords("/path/to/my.fasta", reader, p, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -307,14 +313,15 @@ ATTAT-
 	desiredResult := `Seq1 Homo_sapiens	4
 Seq2 Danio_rerio	5
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := patternRecords("/path/to/my.fasta", reader, p)
+	err := patternRecords("/path/to/my.fasta", reader, p, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -336,14 +343,15 @@ ATTAT-
 	desiredResult := `my.fasta	Seq1 Homo_sapiens	6
 my.fasta	Seq2 Danio_rerio	5
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := patternRecords("/path/to/my.fasta", reader, p)
+	err := patternRecords("/path/to/my.fasta", reader, p, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }

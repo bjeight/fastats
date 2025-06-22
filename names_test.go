@@ -57,14 +57,15 @@ ATTAT-
 	desiredResult := `file.fasta	Seq1
 file.fasta	Seq2
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := namesRecords("/path/to/my/file.fasta", reader, n)
+	err := namesRecords("/path/to/my/file.fasta", reader, n, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -82,14 +83,15 @@ ATTAT-
 	desiredResult := `file.fasta	Seq1 Homo_sapiens X
 file.fasta	Seq2 Danio_rerio Y
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := namesRecords("/path/to/my/file.fasta", reader, n)
+	err := namesRecords("/path/to/my/file.fasta", reader, n, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }

@@ -50,11 +50,7 @@ func (args pattern) writeBody(w io.Writer) error {
 			return err
 		}
 		defer file.Close()
-		s, err := patternRecords(input, reader, args)
-		if err != nil {
-			return err
-		}
-		_, err = w.Write([]byte(s))
+		err = patternRecords(input, reader, args, w)
 		if err != nil {
 			return err
 		}
@@ -63,7 +59,7 @@ func (args pattern) writeBody(w io.Writer) error {
 }
 
 // patternRecords does the work of fastats at, gc, etc. for one fasta file at a time.
-func patternRecords(inputPath string, r *fasta.Reader, args pattern) (string, error) {
+func patternRecords(inputPath string, r *fasta.Reader, args pattern, w io.Writer) error {
 
 	// we need the pattern to be counted as a slice of bytes so that we can perform
 	// the array lookup in the next step
@@ -74,8 +70,6 @@ func patternRecords(inputPath string, r *fasta.Reader, args pattern) (string, er
 	n_total := 0
 	l_total := 0
 
-	output := ""
-
 	// iterate over every record in the fasta file
 	for {
 		record, err := r.Read()
@@ -83,7 +77,7 @@ func patternRecords(inputPath string, r *fasta.Reader, args pattern) (string, er
 			break
 		}
 		if err != nil {
-			return "", err
+			return err
 		}
 		// initiate a table of counts
 		var lookup [256]int
@@ -105,16 +99,26 @@ func patternRecords(inputPath string, r *fasta.Reader, args pattern) (string, er
 			l_total += len(record.Seq)
 		} else {
 			if args.writeFileNames {
-				output = output + returnFileName(inputPath) + "\t"
+				// output = output + returnFileName(inputPath) + "\t"
+				_, err = w.Write([]byte(returnFileName(inputPath) + "\t"))
+				if err != nil {
+					return err
+				}
 			}
 			// print a count or a proportion
 			if args.writeCounts {
 				s := fmt.Sprintf("%s\t%d\n", returnRecordName(record, args.writeDescriptions), n)
-				output = output + s
+				_, err = w.Write([]byte(s))
+				if err != nil {
+					return err
+				}
 			} else {
 				proportion := float64(n) / float64(len(record.Seq))
 				s := fmt.Sprintf("%s\t%f\n", returnRecordName(record, args.writeDescriptions), proportion)
-				output = output + s
+				_, err = w.Write([]byte(s))
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -124,13 +128,19 @@ func patternRecords(inputPath string, r *fasta.Reader, args pattern) (string, er
 	if args.perFile {
 		if args.writeCounts {
 			s := fmt.Sprintf("%s\t%d\n", returnFileName(inputPath), n_total)
-			output = output + s
+			_, err := w.Write([]byte(s))
+			if err != nil {
+				return err
+			}
 		} else {
 			proportion := float64(n_total) / float64(l_total)
 			s := fmt.Sprintf("%s\t%f\n", returnFileName(inputPath), proportion)
-			output = output + s
+			_, err := w.Write([]byte(s))
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	return output, nil
+	return nil
 }
