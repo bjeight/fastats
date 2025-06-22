@@ -8,169 +8,239 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-func Test_length(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := length([]string{}, arguments{
-		file: false, counts: false, description: false, filenames: false,
-	}, out)
+func TestLengthWriteHeader1(t *testing.T) {
+	l := length{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		lenFormat:         "b",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "record\tlength\n"
+
+	err := l.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
-	if out.String() != `record	length
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_length")
-	}
-}
-
-func Test_lengthFile(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := length([]string{}, arguments{
-		file: true, counts: false, description: false, filenames: false,
-	}, out)
-	if err != nil {
-		t.Error(err)
-	}
-	if out.String() != `file	length
-stdin	0
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_lengthFile")
-	}
-}
-
-func Test_lengthFilenames(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := length([]string{}, arguments{
-		file: false, counts: false, description: false, filenames: true,
-	}, out)
-	if err != nil {
-		t.Error(err)
-	}
-	if out.String() != `file	record	length
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_lengthFilenames")
-	}
-}
-
-func Test_lengthFileFilenames(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := length([]string{}, arguments{
-		file: true, counts: false, description: false, filenames: true,
-	}, out)
-	if err != nil {
-		t.Error(err)
-	}
-	if out.String() != `file	length
-stdin	0
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_lengthFileFilenames")
-	}
-}
-
-func Test_lengthCounts(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := length([]string{}, arguments{
-		file: false, counts: true, description: false, filenames: false,
-	}, out)
-	if err != nil {
-		t.Error(err)
-	}
-	if out.String() != `record	length
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_lengthCounts")
-	}
-}
-
-func Test_lengthFileCounts(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := length([]string{}, arguments{
-		file: true, counts: true, description: false, filenames: false,
-	}, out)
-	if err != nil {
-		t.Error(err)
-	}
-	if out.String() != `file	length
-stdin	0
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_lengthFileCounts")
-	}
-}
-
-func Test_lengthRecords(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATG
->seq2
-ATG-ATG-
-ATGCATGC
-ATG
->seq3
-ATGN
-`)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
-
-	lengthRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        false,
-			counts:      false,
-			description: false,
-			pattern:     "",
-		},
-		out,
-	)
-
-	desiredResult := `seq1	3
-seq2	19
-seq3	4
-`
 
 	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_lengthRecords")
+		fmt.Print(out.String())
+		t.Fail()
 	}
 }
 
-func Test_lengthRecordsFile(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATG
->seq2
-ATG-ATG-
-ATGCATGC
-ATG
->seq3
-ATGN
-`)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
+func TestLengthWriteHeader2(t *testing.T) {
+	l := length{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		lenFormat:         "kb",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "record\tlength_kb\n"
 
-	lengthRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        true,
-			counts:      false,
-			description: false,
-			pattern:     "",
-		},
-		out,
-	)
-
-	desiredResult := `myfile.fasta	26
-`
+	err := l.writeHeader(out)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_lengthRecordsFile")
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
+
+func TestLengthWriteHeader3(t *testing.T) {
+	l := length{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		lenFormat:         "mb",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "record\tlength_mb\n"
+
+	err := l.writeHeader(out)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
+
+func TestLengthWriteHeader4(t *testing.T) {
+	l := length{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		lenFormat:         "gb",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "record\tlength_gb\n"
+
+	err := l.writeHeader(out)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
+
+func TestLengthWriteHeader5(t *testing.T) {
+	l := length{
+		perFile:           true,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		lenFormat:         "",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "file\tlength\n"
+
+	err := l.writeHeader(out)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
+
+func TestLengthWriteHeader6(t *testing.T) {
+	l := length{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    true,
+		lenFormat:         "",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "file\trecord\tlength\n"
+
+	err := l.writeHeader(out)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
+
+func TestLengthRecords1(t *testing.T) {
+	l := length{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		lenFormat:         "b",
+	}
+	fastaFile := []byte(`>Seq1
+ATGATG
+>Seq2
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `Seq1	6
+Seq2	6
+`
+
+	out, err := lengthRecords("stdin", reader, l)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
+	}
+}
+
+func TestLengthRecords2(t *testing.T) {
+	l := length{
+		perFile:           true,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		lenFormat:         "b",
+	}
+	fastaFile := []byte(`>Seq1
+ATGATG
+>Seq2
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `stdin	12
+`
+
+	out, err := lengthRecords("stdin", reader, l)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
+	}
+}
+
+func TestLengthRecords3(t *testing.T) {
+	l := length{
+		perFile:           false,
+		writeDescriptions: true,
+		writeFileNames:    false,
+		lenFormat:         "b",
+	}
+	fastaFile := []byte(`>Seq1 Homo_sapiens
+ATGATG
+>Seq2 Danio_rerio
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `Seq1 Homo_sapiens	6
+Seq2 Danio_rerio	6
+`
+
+	out, err := lengthRecords("/path/to/test.fa", reader, l)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
+	}
+}
+
+func TestLengthRecords4(t *testing.T) {
+	l := length{
+		perFile:           false,
+		writeDescriptions: true,
+		writeFileNames:    true,
+		lenFormat:         "b",
+	}
+	fastaFile := []byte(`>Seq1 Homo_sapiens
+ATGATG
+>Seq2 Danio_rerio
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `test.fa	Seq1 Homo_sapiens	6
+test.fa	Seq2 Danio_rerio	6
+`
+
+	out, err := lengthRecords("/path/to/test.fa", reader, l)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }

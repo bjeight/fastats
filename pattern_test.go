@@ -8,362 +8,342 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-func Test_pattern(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := pattern([]string{}, arguments{
-		pattern: "ATat", file: false, counts: false, description: false, filenames: false,
-	}, out)
+func TestPatternWriteHeader1(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		bases:             "ATat",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "record\tATat_prop\n"
+
+	err := p.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
-	if out.String() != `record	ATat_prop
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_pattern")
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
 	}
 }
 
-func Test_patternFile(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := pattern([]string{}, arguments{
-		pattern: "ATat", file: true, counts: false, description: false, filenames: false,
-	}, out)
+func TestPatternWriteHeader2(t *testing.T) {
+	p := pattern{
+		perFile:           true,
+		writeCounts:       false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		bases:             "ATat",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "file\tATat_prop\n"
+
+	err := p.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
-	if out.String() != `file	ATat_prop
-stdin	NaN
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternFile")
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
 	}
 }
 
-func Test_patternFilenames(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := pattern([]string{}, arguments{
-		pattern: "ATat", file: false, counts: false, description: false, filenames: true,
-	}, out)
+func TestPatternWriteHeader3(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       true,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		bases:             "ATat",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "record\tATat_count\n"
+
+	err := p.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
-	if out.String() != `file	record	ATat_prop
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternFilenames")
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
 	}
 }
 
-func Test_patternFileFilenames(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := pattern([]string{}, arguments{
-		pattern: "ATat", file: true, counts: false, description: false, filenames: true,
-	}, out)
+func TestPatternWriteHeader4(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       true,
+		writeDescriptions: false,
+		writeFileNames:    true,
+		bases:             "ATat",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "file\trecord\tATat_count\n"
+
+	err := p.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
-	if out.String() != `file	ATat_prop
-stdin	NaN
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternFilenames")
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
 	}
 }
 
-func Test_patternCounts(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := pattern([]string{}, arguments{
-		pattern: "ATat", file: false, counts: true, description: false, filenames: false,
-	}, out)
+func TestPatternWriteHeader5(t *testing.T) {
+	p := pattern{
+		perFile:           true,
+		writeCounts:       true,
+		writeDescriptions: false,
+		writeFileNames:    true,
+		bases:             "ATat",
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "file\tATat_count\n"
+
+	err := p.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
-	if out.String() != `record	ATat_count
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternCounts")
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
 	}
 }
 
-func Test_patternFileCounts(t *testing.T) {
-	out := new(bytes.Buffer)
-	err := pattern([]string{}, arguments{
-		pattern: "ATat", file: true, counts: true, description: false, filenames: false,
-	}, out)
+func TestPatternRecords1(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		bases:             "ATat",
+	}
+	fastaFile := []byte(`>Seq1
+ATGATG
+>Seq2
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `Seq1	0.666667
+Seq2	0.833333
+`
+
+	out, err := patternRecords("stdin", reader, p)
 	if err != nil {
 		t.Error(err)
 	}
-	if out.String() != `file	ATat_count
-stdin	0
-` {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternFileCounts")
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }
 
-func Test_patternRecordsAT(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATGC
->seq2
-ATG-ATG-
-ATGCATGC
-ATGC
->seq3
-AT
+func TestPatternRecords2(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		bases:             "GCgc",
+	}
+	fastaFile := []byte(`>Seq1
+ATGATG
+>Seq2
+ATTAT-
 `)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
-
-	patternRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        false,
-			counts:      false,
-			description: false,
-			filenames:   false,
-			pattern:     "ATat",
-		},
-		out,
-	)
-
-	desiredResult := `seq1	0.500000
-seq2	0.500000
-seq3	1.000000
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `Seq1	0.333333
+Seq2	0.000000
 `
 
-	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternRecordsAT")
+	out, err := patternRecords("stdin", reader, p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }
 
-func Test_patternRecordsGC(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATGC
->seq2
-ATG-ATG-
-ATGCATGC
-ATGC
->seq3
-AT
+func TestPatternRecords3(t *testing.T) {
+	p := pattern{
+		perFile:           true,
+		writeCounts:       false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		bases:             "ATat",
+	}
+	fastaFile := []byte(`>Seq1
+ATGATG
+>Seq2
+ATTAT-
 `)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
-
-	patternRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        false,
-			counts:      false,
-			description: false,
-			filenames:   false,
-			pattern:     "GCgc",
-		},
-		out,
-	)
-
-	desiredResult := `seq1	0.500000
-seq2	0.400000
-seq3	0.000000
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `stdin	0.750000
 `
 
-	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternRecordsGC")
+	out, err := patternRecords("stdin", reader, p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }
 
-func Test_patternRecordsATFile(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATGC
->seq2
-ATG-ATG-
-ATGCATGC
-ATGC
->seq3
-ATGC
+func TestPatternRecords4(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       true,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		bases:             "ATat",
+	}
+	fastaFile := []byte(`>Seq1
+ATGATG
+>Seq2
+ATTAT-
 `)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
-
-	patternRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        true,
-			counts:      false,
-			description: false,
-			filenames:   false,
-			pattern:     "ATat",
-		},
-		out,
-	)
-
-	desiredResult := `myfile.fasta	0.500000
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `Seq1	4
+Seq2	5
 `
 
-	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternRecordsATFile")
+	out, err := patternRecords("stdin", reader, p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }
 
-func Test_patternRecordsATCount(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATGC
->seq2
-ATG-ATG-
-ATGCATGC
-ATGC
->seq3
-AT
+func TestPatternRecords5(t *testing.T) {
+	p := pattern{
+		perFile:           true,
+		writeCounts:       true,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		bases:             "ATat",
+	}
+	fastaFile := []byte(`>Seq1
+ATGATG
+>Seq2
+ATTAT-
 `)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
-
-	patternRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        false,
-			counts:      true,
-			description: false,
-			filenames:   false,
-			pattern:     "ATat",
-		},
-		out,
-	)
-
-	desiredResult := `seq1	2
-seq2	10
-seq3	2
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `stdin	9
 `
 
-	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternRecordsATCount")
+	out, err := patternRecords("stdin", reader, p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }
 
-func Test_patternFilenameRecordsATCount(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATGC
->seq2
-ATG-ATG-
-ATGCATGC
-ATGC
->seq3
-AT
+func TestPatternRecords6(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       true,
+		writeDescriptions: false,
+		writeFileNames:    true,
+		bases:             "ATat",
+	}
+	fastaFile := []byte(`>Seq1
+ATGATG
+>Seq2
+ATTAT-
 `)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
-
-	patternRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        false,
-			counts:      true,
-			description: false,
-			filenames:   true,
-			pattern:     "ATat",
-		},
-		out,
-	)
-
-	desiredResult := `myfile.fasta	seq1	2
-myfile.fasta	seq2	10
-myfile.fasta	seq3	2
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `my.fasta	Seq1	4
+my.fasta	Seq2	5
 `
 
-	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternRecordsATCount")
+	out, err := patternRecords("/path/to/my.fasta", reader, p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }
 
-func Test_patternRecordsATFileCount(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATGC
->seq2
-ATG-ATG-
-ATGCATGC
-ATGC
->seq3
-AT
+func TestPatternRecords7(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       true,
+		writeDescriptions: true,
+		writeFileNames:    false,
+		bases:             "ATat",
+	}
+	fastaFile := []byte(`>Seq1 Homo_sapiens
+ATGATG
+>Seq2 Danio_rerio
+ATTAT-
 `)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
-
-	patternRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        true,
-			counts:      true,
-			description: false,
-			filenames:   false,
-			pattern:     "ATat",
-		},
-		out,
-	)
-
-	desiredResult := `myfile.fasta	14
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `Seq1 Homo_sapiens	4
+Seq2 Danio_rerio	5
 `
 
-	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternRecordsATFileCount")
+	out, err := patternRecords("/path/to/my.fasta", reader, p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }
 
-func Test_patternRecordsATFileFilenameCount(t *testing.T) {
-	fastaData := []byte(
-		`>seq1
-ATGC
->seq2
-ATG-ATG-
-ATGCATGC
-ATGC
->seq3
-AT
+func TestPatternRecords8(t *testing.T) {
+	p := pattern{
+		perFile:           false,
+		writeCounts:       true,
+		writeDescriptions: true,
+		writeFileNames:    true,
+		bases:             "ATGCatgc",
+	}
+	fastaFile := []byte(`>Seq1 Homo_sapiens
+ATGATG
+>Seq2 Danio_rerio
+ATTAT-
 `)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
-
-	patternRecords(
-		"myfile.fasta",
-		r,
-		arguments{
-			file:        true,
-			counts:      true,
-			description: false,
-			filenames:   true,
-			pattern:     "ATat",
-		},
-		out,
-	)
-
-	desiredResult := `myfile.fasta	14
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `my.fasta	Seq1 Homo_sapiens	6
+my.fasta	Seq2 Danio_rerio	5
 `
 
-	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_patternRecordsATFileCount")
+	out, err := patternRecords("/path/to/my.fasta", reader, p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }

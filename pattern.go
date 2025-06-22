@@ -7,57 +7,74 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-// pattern() is fastats at, gc, gaps etc. in the cli. It writes the appropriate header (which
-// depends on the cli arguments), then processes the fasta file(s) from the command line or stdin, depending
-// on what is provided by the user.
-func pattern(filepaths []string, args arguments, w io.Writer) error {
+type pattern struct {
+	inputs            []string // the list of files provided on the command line
+	perFile           bool     // calculate stats per file
+	writeCounts       bool     // calculate counts (else calculate proportions)
+	writeDescriptions bool     // write record descriptions (else write record ids)
+	writeFileNames    bool     // write a column with filename
+	bases             string   // arbitrary base content to apply the pattern functionality to
+}
 
-	// write the correct header, depending on whether the statistics are
-	// to be calculated per record or per file, and whether they are counts
-	// or proportions
-	if args.file || args.filenames {
+func (args pattern) writeHeader(w io.Writer) error {
+	if args.perFile || args.writeFileNames {
 		_, err := w.Write([]byte("file\t"))
 		if err != nil {
 			return err
 		}
 	}
-	if !args.file {
+	if !args.perFile {
 		_, err := w.Write([]byte("record\t"))
 		if err != nil {
 			return err
 		}
 	}
-	if args.counts {
-		_, err := w.Write([]byte(args.pattern + "_count\n"))
+	if args.writeCounts {
+		_, err := w.Write([]byte(args.bases + "_count\n"))
 		if err != nil {
 			return err
 		}
 	} else {
-		_, err := w.Write([]byte(args.pattern + "_prop\n"))
+		_, err := w.Write([]byte(args.bases + "_prop\n"))
 		if err != nil {
 			return err
 		}
 	}
+	return nil
+}
 
-	err := applyFastatsFunction(filepaths, patternRecords, args, w)
-	if err != nil {
-		return err
+func (args pattern) writeBody(w io.Writer) error {
+	for _, input := range args.inputs {
+		reader, file, err := getReaderFile(input)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		s, err := patternRecords(input, reader, args)
+		if err != nil {
+			return err
+		}
+		_, err = w.Write([]byte(s))
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
 // patternRecords does the work of fastats at, gc, etc. for one fasta file at a time.
-func patternRecords(filename string, r *fasta.Reader, args arguments, w io.Writer) error {
+func patternRecords(inputPath string, r *fasta.Reader, args pattern) (string, error) {
 
 	// we need the pattern to be counted as a slice of bytes so that we can perform
 	// the array lookup in the next step
-	pattern_slice := []byte(args.pattern)
+	bases_slice := []byte(args.bases)
 
 	// initiate counts for the number of occurrences of the specified pattern, and
 	// the length of each record
 	n_total := 0
 	l_total := 0
+
+	output := ""
 
 	// iterate over every record in the fasta file
 	for {
@@ -66,7 +83,7 @@ func patternRecords(filename string, r *fasta.Reader, args arguments, w io.Write
 			break
 		}
 		if err != nil {
-			return err
+			return "", err
 		}
 		// initiate a table of counts
 		var lookup [256]int
@@ -77,55 +94,43 @@ func patternRecords(filename string, r *fasta.Reader, args arguments, w io.Write
 		// for every nucleotide to be looked up, add its count from the lookup table
 		// to the total
 		n := 0
-		for _, b := range pattern_slice {
+		for _, b := range bases_slice {
 			n += lookup[b]
 		}
 
 		// if the statistic is to be calculated per file, add this record's pattern count
 		// and length to the total, else write this records statistic.
-		if args.file {
+		if args.perFile {
 			n_total += n
 			l_total += len(record.Seq)
 		} else {
-			if args.filenames {
-				w.Write([]byte(filename + "\t"))
+			if args.writeFileNames {
+				output = output + returnFileName(inputPath) + "\t"
 			}
 			// print a count or a proportion
-			if args.counts {
-				s := fmt.Sprintf("%s\t%d\n", returnRecordName(record, args.description), n)
-				_, err := w.Write([]byte(s))
-				if err != nil {
-					return err
-				}
+			if args.writeCounts {
+				s := fmt.Sprintf("%s\t%d\n", returnRecordName(record, args.writeDescriptions), n)
+				output = output + s
 			} else {
 				proportion := float64(n) / float64(len(record.Seq))
-				s := fmt.Sprintf("%s\t%f\n", returnRecordName(record, args.description), proportion)
-				_, err := w.Write([]byte(s))
-				if err != nil {
-					return err
-				}
+				s := fmt.Sprintf("%s\t%f\n", returnRecordName(record, args.writeDescriptions), proportion)
+				output = output + s
 			}
 		}
 	}
 
 	// if the statistic is to be calculated per file, we print the statistic after all
 	// the records have been processed
-	if args.file {
-		if args.counts {
-			s := fmt.Sprintf("%s\t%d\n", filename, n_total)
-			_, err := w.Write([]byte(s))
-			if err != nil {
-				return err
-			}
+	if args.perFile {
+		if args.writeCounts {
+			s := fmt.Sprintf("%s\t%d\n", returnFileName(inputPath), n_total)
+			output = output + s
 		} else {
 			proportion := float64(n_total) / float64(l_total)
-			s := fmt.Sprintf("%s\t%f\n", filename, proportion)
-			_, err := w.Write([]byte(s))
-			if err != nil {
-				return err
-			}
+			s := fmt.Sprintf("%s\t%f\n", returnFileName(inputPath), proportion)
+			output = output + s
 		}
 	}
 
-	return nil
+	return output, nil
 }

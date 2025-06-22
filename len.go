@@ -8,19 +8,21 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-// length() is fastats len in the cli. It writes the appropriate header (which depends on the cli
-// arguments), then processes the fasta file(s) from the command line or stdin, depending on what is provided
-// by the user.
-func length(filepaths []string, args arguments, w io.Writer) error {
+type length struct {
+	inputs            []string
+	perFile           bool
+	writeDescriptions bool
+	writeFileNames    bool
+	lenFormat         string
+}
 
-	// write the correct header, depending on whether the statistics are
-	// to be calculated per file or per record...
-	if args.file {
+func (args length) writeHeader(w io.Writer) error {
+	if args.perFile {
 		_, err := w.Write([]byte("file\tlength"))
 		if err != nil {
 			return err
 		}
-	} else if !args.filenames {
+	} else if !args.writeFileNames {
 		_, err := w.Write([]byte("record\tlength"))
 		if err != nil {
 			return err
@@ -32,20 +34,9 @@ func length(filepaths []string, args arguments, w io.Writer) error {
 		}
 	}
 
-	// ...and whether we are printing length in units other than bases
 	switch args.lenFormat {
-	case "kb":
-		_, err := w.Write([]byte("_kb\n"))
-		if err != nil {
-			return err
-		}
-	case "mb":
-		_, err := w.Write([]byte("_mb\n"))
-		if err != nil {
-			return err
-		}
-	case "gb":
-		_, err := w.Write([]byte("_gb\n"))
+	case "kb", "mb", "gb":
+		_, err := w.Write([]byte("_" + args.lenFormat + "\n"))
 		if err != nil {
 			return err
 		}
@@ -55,20 +46,35 @@ func length(filepaths []string, args arguments, w io.Writer) error {
 			return err
 		}
 	}
+	return nil
+}
 
-	err := applyFastatsFunction(filepaths, lengthRecords, args, w)
-	if err != nil {
-		return err
+func (args length) writeBody(w io.Writer) error {
+	for _, input := range args.inputs {
+		reader, file, err := getReaderFile(input)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		s, err := lengthRecords(input, reader, args)
+		if err != nil {
+			return err
+		}
+		_, err = w.Write([]byte(s))
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
 // lengthRecords does the work of fastats len for one fasta file at a time.
-func lengthRecords(filename string, r *fasta.Reader, args arguments, w io.Writer) error {
+func lengthRecords(inputPath string, r *fasta.Reader, args length) (string, error) {
 
 	// initiate a count for the length of each record
 	l_total := 0
+
+	output := ""
 
 	// iterate over every record in the fasta file
 	for {
@@ -77,35 +83,29 @@ func lengthRecords(filename string, r *fasta.Reader, args arguments, w io.Writer
 			break
 		}
 		if err != nil {
-			return (err)
+			return "", err
 		}
 		// if the statistic is to be calculated per file, add this record's length
 		// to the total, else just write it.
-		if args.file {
+		if args.perFile {
 			l_total += len(record.Seq)
 		} else {
-			if args.filenames {
-				w.Write([]byte(filename + "\t"))
+			if args.writeFileNames {
+				output = output + returnFileName(inputPath) + "\t"
 			}
-			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.description), returnRecordLength(len(record.Seq), args.lenFormat))
-			_, err := w.Write([]byte(s))
-			if err != nil {
-				return err
-			}
+			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.writeDescriptions), returnRecordLength(len(record.Seq), args.lenFormat))
+			output = output + s
 		}
 	}
 
 	// if the statistic is to be calculated per file, we print the total after all
 	// the records have been processed
-	if args.file {
-		s := fmt.Sprintf("%s\t%s\n", filename, returnRecordLength(l_total, args.lenFormat))
-		_, err := w.Write([]byte(s))
-		if err != nil {
-			return err
-		}
+	if args.perFile {
+		s := fmt.Sprintf("%s\t%s\n", returnFileName(inputPath), returnRecordLength(l_total, args.lenFormat))
+		output = output + s
 	}
 
-	return nil
+	return output, nil
 }
 
 // returnRecordLength (potentially) converts bases to kb, mb, gb.

@@ -7,28 +7,36 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-// num() is fastats num in the cli. It writes the header, then processes the fasta file(s)
-// from the command line or stdin, depending on what is provided by the user.
-func num(filepaths []string, args arguments, w io.Writer) error {
+type num struct {
+	inputs []string
+}
 
-	// Write the correct header for the output
+func (args num) writeHeader(w io.Writer) error {
 	_, err := w.Write([]byte("file\tn_records\n"))
-	if err != nil {
-		return err
-	}
+	return err
+}
 
-	// pass numRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err = applyFastatsFunction(filepaths, numRecords, args, w)
-	if err != nil {
-		return err
+func (args num) writeBody(w io.Writer) error {
+	for _, input := range args.inputs {
+		reader, file, err := getReaderFile(input)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		s, err := numRecords(input, reader, args)
+		if err != nil {
+			return err
+		}
+		_, err = w.Write([]byte(s))
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
 // numRecords does the work of fastats num for one fasta file at a time.
-func numRecords(filename string, r *fasta.Reader, args arguments, w io.Writer) error {
-
+func numRecords(inputPath string, r *fasta.Reader, args num) (string, error) {
 	// initiate a count for the number of records
 	c_total := 0
 
@@ -39,17 +47,11 @@ func numRecords(filename string, r *fasta.Reader, args arguments, w io.Writer) e
 			break
 		}
 		if err != nil {
-			return err
+			return "", err
 		}
 		// for every record, +1 the count
 		c_total += 1
 	}
-	// print the count
-	s := fmt.Sprintf("%s\t%d\n", filename, c_total)
-	_, err := w.Write([]byte(s))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	s := fmt.Sprintf("%s\t%d\n", returnFileName(inputPath), c_total)
+	return s, nil
 }
