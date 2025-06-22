@@ -23,7 +23,7 @@ AT
 	fastaR := bytes.NewReader(fastaData)
 	r := NewReader(fastaR)
 
-	desiredResult := FastaRecord{
+	desiredResult := Record{
 		ID:          "seq1",
 		Description: "seq1",
 		Seq:         []byte("ATGC"),
@@ -37,7 +37,7 @@ AT
 		t.Errorf("problem in TestRead(seq1)")
 	}
 
-	desiredResult = FastaRecord{
+	desiredResult = Record{
 		ID:          "seq2",
 		Description: "seq2 something",
 		Seq:         []byte("ATG-ATG-ATGCATGCATGC"),
@@ -51,7 +51,7 @@ AT
 		t.Errorf("problem in TestRead(seq2)")
 	}
 
-	desiredResult = FastaRecord{
+	desiredResult = Record{
 		ID:          "seq3",
 		Description: "seq3",
 		Seq:         []byte("AT"),
@@ -65,7 +65,7 @@ AT
 		t.Errorf("problem in TestRead(seq3)")
 	}
 
-	desiredResult = FastaRecord{}
+	desiredResult = Record{}
 	record, err = r.Read()
 	if !errors.Is(err, io.EOF) {
 		t.Error(err)
