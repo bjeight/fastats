@@ -7,32 +7,36 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-// num() is fastats num in the cli. It writes the header, then passes numRecords() + the
-// cli arguments + the writer to collectCommandLine, which processes the fasta file(s)
-// from the command line or stdin, depending on what is provided by the user.
-func num(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
+type num struct {
+	inputs []string
+}
 
-	// Write the correct header for the output
+func (args num) writeHeader(w io.Writer) error {
 	_, err := w.Write([]byte("file\tn_records\n"))
-	if err != nil {
-		return err
-	}
+	return err
+}
 
-	// pass numRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err = collectCommandLine(w, numRecords, filepaths, pattern, file, counts, description, lenFormat)
-	if err != nil {
-		return err
+func (args num) writeBody(w io.Writer) error {
+	for _, input := range args.inputs {
+		reader, file, err := getReaderFile(input)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		s, err := numRecords(input, reader, args)
+		if err != nil {
+			return err
+		}
+		_, err = w.Write([]byte(s))
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
 // numRecords does the work of fastats num for one fasta file at a time.
-func numRecords(r *fasta.Reader, args arguments, w io.Writer) error {
-
-	// get the file name for when we need to print it
-	filename := filenameFromFullPath(args.filepath)
-
+func numRecords(inputPath string, r *fasta.Reader, args num) (string, error) {
 	// initiate a count for the number of records
 	c_total := 0
 
@@ -43,17 +47,11 @@ func numRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 			break
 		}
 		if err != nil {
-			return err
+			return "", err
 		}
 		// for every record, +1 the count
 		c_total += 1
 	}
-	// print the count
-	s := fmt.Sprintf("%s\t%d\n", filename, c_total)
-	_, err := w.Write([]byte(s))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	s := fmt.Sprintf("%s\t%d\n", returnFileName(inputPath), c_total)
+	return s, nil
 }

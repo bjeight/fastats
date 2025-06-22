@@ -66,6 +66,20 @@ chrY	0.184749
 chrX	0.392343
 ```
 
+```
+❯ fastats content -b AG GRCh38.p14.genome.fa | head
+record	AG_prop
+chr1	0.462659
+chr2	0.496471
+chr3	0.499423
+chr4	0.498870
+chr5	0.498951
+chr6	0.497985
+chr7	0.498520
+chr8	0.499091
+chr9	0.440096
+```
+
 ### Help
 
 ```
@@ -78,6 +92,7 @@ Usage:
 Available Commands:
   at          AT content
   atgc        ATGC content
+  content     Arbitrary base content
   gaps        Gap content
   gc          GC content
   help        Help about any command
@@ -85,13 +100,13 @@ Available Commands:
   n           N content
   names       Record names
   num         Number of records
-  pattern     Arbitrary base content
   soft        Softmasked content
 
 Flags:
-  -c, --count         print counts (default is proportions)
-  -d, --description   write record descriptions (default is IDs)
+  -c, --count         print base content counts (default is proportions)
+  -d, --description   print record descriptions (default is IDs)
   -f, --file          calculate statistics per file (default is per record)
+      --fn            always print a filename column
   -h, --help          help for fastats
   -v, --version       version for fastats
 

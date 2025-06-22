@@ -8,40 +8,35 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-// length() is fastats len in the cli. It writes the appropriate header (which depends on the cli
-// arguments), then passes lengthRecords() + the cli arguments + the writer to collectCommandLine,
-// which processes the fasta file(s) from the command line or stdin, depending on what is provided
-// by the user.
-func length(w io.Writer, filepaths []string, pattern string, file bool, counts bool, description bool, lenFormat string) error {
+type length struct {
+	inputs            []string
+	perFile           bool
+	writeDescriptions bool
+	writeFileNames    bool
+	lenFormat         string
+}
 
-	// write the correct header, depending on whether the statistics are
-	// to be calculated per file or per record...
-	if file {
+func (args length) writeHeader(w io.Writer) error {
+	if args.perFile {
 		_, err := w.Write([]byte("file\tlength"))
 		if err != nil {
 			return err
 		}
-	} else {
+	} else if !args.writeFileNames {
 		_, err := w.Write([]byte("record\tlength"))
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err := w.Write([]byte("file\trecord\tlength"))
 		if err != nil {
 			return err
 		}
 	}
 
-	// ...and whether we are printing length in units other than bases
-	switch lenFormat {
-	case "kb":
-		_, err := w.Write([]byte("_kb\n"))
-		if err != nil {
-			return err
-		}
-	case "mb":
-		_, err := w.Write([]byte("_mb\n"))
-		if err != nil {
-			return err
-		}
-	case "gb":
-		_, err := w.Write([]byte("_gb\n"))
+	switch args.lenFormat {
+	case "kb", "mb", "gb":
+		_, err := w.Write([]byte("_" + args.lenFormat + "\n"))
 		if err != nil {
 			return err
 		}
@@ -51,24 +46,35 @@ func length(w io.Writer, filepaths []string, pattern string, file bool, counts b
 			return err
 		}
 	}
+	return nil
+}
 
-	// pass lengthRecords + the cli arguments to collectCommandLine() for processing the fasta file(s)
-	err := collectCommandLine(w, lengthRecords, filepaths, pattern, file, counts, description, lenFormat)
-	if err != nil {
-		return err
+func (args length) writeBody(w io.Writer) error {
+	for _, input := range args.inputs {
+		reader, file, err := getReaderFile(input)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		s, err := lengthRecords(input, reader, args)
+		if err != nil {
+			return err
+		}
+		_, err = w.Write([]byte(s))
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
 // lengthRecords does the work of fastats len for one fasta file at a time.
-func lengthRecords(r *fasta.Reader, args arguments, w io.Writer) error {
-
-	// get the file name in case we need to print it to stdout
-	filename := filenameFromFullPath(args.filepath)
+func lengthRecords(inputPath string, r *fasta.Reader, args length) (string, error) {
 
 	// initiate a count for the length of each record
 	l_total := 0
+
+	output := ""
 
 	// iterate over every record in the fasta file
 	for {
@@ -77,32 +83,29 @@ func lengthRecords(r *fasta.Reader, args arguments, w io.Writer) error {
 			break
 		}
 		if err != nil {
-			return (err)
+			return "", err
 		}
 		// if the statistic is to be calculated per file, add this record's length
 		// to the total, else just write it.
-		if args.file {
+		if args.perFile {
 			l_total += len(record.Seq)
 		} else {
-			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.description), returnRecordLength(len(record.Seq), args.lenFormat))
-			_, err := w.Write([]byte(s))
-			if err != nil {
-				return err
+			if args.writeFileNames {
+				output = output + returnFileName(inputPath) + "\t"
 			}
+			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.writeDescriptions), returnRecordLength(len(record.Seq), args.lenFormat))
+			output = output + s
 		}
 	}
 
 	// if the statistic is to be calculated per file, we print the total after all
 	// the records have been processed
-	if args.file {
-		s := fmt.Sprintf("%s\t%s\n", filename, returnRecordLength(l_total, args.lenFormat))
-		_, err := w.Write([]byte(s))
-		if err != nil {
-			return err
-		}
+	if args.perFile {
+		s := fmt.Sprintf("%s\t%s\n", returnFileName(inputPath), returnRecordLength(l_total, args.lenFormat))
+		output = output + s
 	}
 
-	return nil
+	return output, nil
 }
 
 // returnRecordLength (potentially) converts bases to kb, mb, gb.

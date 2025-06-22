@@ -8,66 +8,88 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-func Test_names(t *testing.T) {
-	fastaData := []byte(
-		`>seq1 is cool
-ATG
->seq2 is cool too
-ATG-ATG-
-ATGCATGC
-ATG
->seq3
-ATGN
-`)
-	fastaR := bytes.NewReader(fastaData)
-	r := fasta.NewReader(fastaR)
-	out := new(bytes.Buffer)
+func TestNamesWriteHeader1(t *testing.T) {
+	n := names{
+		writeDescriptions: false,
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "file\tid\n"
 
-	namesRecords(
-		r,
-		arguments{
-			filepath:    "/path/to/myfile.fasta",
-			file:        false,
-			counts:      false,
-			description: false,
-			pattern:     "",
-		},
-		out,
-	)
-
-	desiredResult := `myfile.fasta	seq1
-myfile.fasta	seq2
-myfile.fasta	seq3
-`
-
-	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_names (id)")
+	err := n.writeHeader(out)
+	if err != nil {
+		t.Error(err)
 	}
 
-	fastaR = bytes.NewReader(fastaData)
-	r = fasta.NewReader(fastaR)
-	out = new(bytes.Buffer)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
 
-	namesRecords(
-		r,
-		arguments{
-			filepath:    "/path/to/myfile.fasta",
-			file:        false,
-			counts:      false,
-			description: true,
-			pattern:     "",
-		},
-		out,
-	)
+func TestNamesWriteHeader2(t *testing.T) {
+	n := names{
+		writeDescriptions: true,
+	}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "file\tdescription\n"
 
-	desiredResult = `myfile.fasta	seq1 is cool
-myfile.fasta	seq2 is cool too
-myfile.fasta	seq3
-`
+	err := n.writeHeader(out)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if out.String() != desiredResult {
-		fmt.Println(out.String())
-		t.Errorf("problem in Test_names (description)")
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
+
+func TestNamesRecords1(t *testing.T) {
+	n := names{
+		writeDescriptions: false,
+	}
+	fastaFile := []byte(`>Seq1 Homo_sapiens X
+ATGATG
+>Seq2 Danio_rerio Y
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `file.fasta	Seq1
+file.fasta	Seq2
+`
+
+	out, err := namesRecords("/path/to/my/file.fasta", reader, n)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
+	}
+}
+
+func TestNamesRecords2(t *testing.T) {
+	n := names{
+		writeDescriptions: true,
+	}
+	fastaFile := []byte(`>Seq1 Homo_sapiens X
+ATGATG
+>Seq2 Danio_rerio Y
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `file.fasta	Seq1 Homo_sapiens X
+file.fasta	Seq2 Danio_rerio Y
+`
+
+	out, err := namesRecords("/path/to/my/file.fasta", reader, n)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != desiredResult {
+		fmt.Print(out)
+		t.Fail()
 	}
 }
