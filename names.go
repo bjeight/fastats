@@ -29,11 +29,7 @@ func (args names) writeBody(w io.Writer) error {
 			return err
 		}
 		defer file.Close()
-		s, err := namesRecords(input, reader, args)
-		if err != nil {
-			return err
-		}
-		_, err = w.Write([]byte(s))
+		err = namesRecords(input, reader, args, w)
 		if err != nil {
 			return err
 		}
@@ -42,8 +38,8 @@ func (args names) writeBody(w io.Writer) error {
 }
 
 // namesRecords does the work of fastats names for one fasta file at a time.
-func namesRecords(inputPath string, r *fasta.Reader, args names) (string, error) {
-	output := ""
+func namesRecords(inputPath string, r *fasta.Reader, args names, w io.Writer) error {
+
 	// iterate over every record in the fasta file
 	for {
 		record, err := r.Read()
@@ -51,16 +47,16 @@ func namesRecords(inputPath string, r *fasta.Reader, args names) (string, error)
 			break
 		}
 		if err != nil {
-			return "", err
+			return err
 		}
 		// if the statistic is to be calculated per file, add this record's length
 		// to the total, else just write it.
 		s := fmt.Sprintf("%s\t%s\n", returnFileName(inputPath), returnRecordName(record, args.writeDescriptions))
-		output = output + s
+		_, err = w.Write([]byte(s))
 		if err != nil {
-			return "", err
+			return err
 		}
 	}
 
-	return output, nil
+	return nil
 }

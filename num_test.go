@@ -34,14 +34,15 @@ ATTAT-
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
 	desiredResult := `stdin	2
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := numRecords("stdin", reader, n)
+	err := numRecords("stdin", reader, n, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }

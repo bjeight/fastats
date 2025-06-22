@@ -23,11 +23,7 @@ func (args num) writeBody(w io.Writer) error {
 			return err
 		}
 		defer file.Close()
-		s, err := numRecords(input, reader, args)
-		if err != nil {
-			return err
-		}
-		_, err = w.Write([]byte(s))
+		err = numRecords(input, reader, args, w)
 		if err != nil {
 			return err
 		}
@@ -36,7 +32,7 @@ func (args num) writeBody(w io.Writer) error {
 }
 
 // numRecords does the work of fastats num for one fasta file at a time.
-func numRecords(inputPath string, r *fasta.Reader, args num) (string, error) {
+func numRecords(inputPath string, r *fasta.Reader, args num, w io.Writer) error {
 	// initiate a count for the number of records
 	c_total := 0
 
@@ -47,11 +43,12 @@ func numRecords(inputPath string, r *fasta.Reader, args num) (string, error) {
 			break
 		}
 		if err != nil {
-			return "", err
+			return err
 		}
 		// for every record, +1 the count
 		c_total += 1
 	}
 	s := fmt.Sprintf("%s\t%d\n", returnFileName(inputPath), c_total)
-	return s, nil
+	_, err := w.Write([]byte(s))
+	return err
 }

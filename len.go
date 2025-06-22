@@ -56,11 +56,7 @@ func (args length) writeBody(w io.Writer) error {
 			return err
 		}
 		defer file.Close()
-		s, err := lengthRecords(input, reader, args)
-		if err != nil {
-			return err
-		}
-		_, err = w.Write([]byte(s))
+		err = lengthRecords(input, reader, args, w)
 		if err != nil {
 			return err
 		}
@@ -69,12 +65,10 @@ func (args length) writeBody(w io.Writer) error {
 }
 
 // lengthRecords does the work of fastats len for one fasta file at a time.
-func lengthRecords(inputPath string, r *fasta.Reader, args length) (string, error) {
+func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) error {
 
 	// initiate a count for the length of each record
 	l_total := 0
-
-	output := ""
 
 	// iterate over every record in the fasta file
 	for {
@@ -83,7 +77,7 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length) (string, erro
 			break
 		}
 		if err != nil {
-			return "", err
+			return err
 		}
 		// if the statistic is to be calculated per file, add this record's length
 		// to the total, else just write it.
@@ -91,10 +85,16 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length) (string, erro
 			l_total += len(record.Seq)
 		} else {
 			if args.writeFileNames {
-				output = output + returnFileName(inputPath) + "\t"
+				_, err = w.Write([]byte(returnFileName(inputPath) + "\t"))
+				if err != nil {
+					return err
+				}
 			}
 			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.writeDescriptions), returnRecordLength(len(record.Seq), args.lenFormat))
-			output = output + s
+			_, err = w.Write([]byte(s))
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -102,10 +102,13 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length) (string, erro
 	// the records have been processed
 	if args.perFile {
 		s := fmt.Sprintf("%s\t%s\n", returnFileName(inputPath), returnRecordLength(l_total, args.lenFormat))
-		output = output + s
+		_, err := w.Write([]byte(s))
+		if err != nil {
+			return err
+		}
 	}
 
-	return output, nil
+	return nil
 }
 
 // returnRecordLength (potentially) converts bases to kb, mb, gb.

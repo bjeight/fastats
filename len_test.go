@@ -150,14 +150,15 @@ ATTAT-
 	desiredResult := `Seq1	6
 Seq2	6
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := lengthRecords("stdin", reader, l)
+	err := lengthRecords("stdin", reader, l, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -177,14 +178,15 @@ ATTAT-
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
 	desiredResult := `stdin	12
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := lengthRecords("stdin", reader, l)
+	err := lengthRecords("stdin", reader, l, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -205,14 +207,15 @@ ATTAT-
 	desiredResult := `Seq1 Homo_sapiens	6
 Seq2 Danio_rerio	6
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := lengthRecords("/path/to/test.fa", reader, l)
+	err := lengthRecords("/path/to/test.fa", reader, l, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
@@ -233,14 +236,15 @@ ATTAT-
 	desiredResult := `test.fa	Seq1 Homo_sapiens	6
 test.fa	Seq2 Danio_rerio	6
 `
+	out := bytes.NewBuffer(make([]byte, 0))
 
-	out, err := lengthRecords("/path/to/test.fa", reader, l)
+	err := lengthRecords("/path/to/test.fa", reader, l, out)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out != desiredResult {
-		fmt.Print(out)
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
 		t.Fail()
 	}
 }
