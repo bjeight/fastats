@@ -9,17 +9,21 @@ import (
 )
 
 func TestPatternWriteHeader1(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       false,
 		writeDescriptions: false,
 		writeFileNames:    false,
-		bases:             "ATat",
+		patterns: []pattern{
+			{
+				stat:  "prop",
+				bases: "ATat",
+			},
+		},
 	}
 	out := bytes.NewBuffer(make([]byte, 0))
 	desiredResult := "record\tATat_prop\n"
 
-	err := p.writeHeader(out)
+	err := c.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -31,17 +35,21 @@ func TestPatternWriteHeader1(t *testing.T) {
 }
 
 func TestPatternWriteHeader2(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           true,
-		writeCounts:       false,
 		writeDescriptions: false,
 		writeFileNames:    false,
-		bases:             "ATat",
+		patterns: []pattern{
+			{
+				stat:  "prop",
+				bases: "ATat",
+			},
+		},
 	}
 	out := bytes.NewBuffer(make([]byte, 0))
 	desiredResult := "file\tATat_prop\n"
 
-	err := p.writeHeader(out)
+	err := c.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -53,17 +61,21 @@ func TestPatternWriteHeader2(t *testing.T) {
 }
 
 func TestPatternWriteHeader3(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       true,
 		writeDescriptions: false,
 		writeFileNames:    false,
-		bases:             "ATat",
+		patterns: []pattern{
+			{
+				stat:  "count",
+				bases: "ATat",
+			},
+		},
 	}
 	out := bytes.NewBuffer(make([]byte, 0))
 	desiredResult := "record\tATat_count\n"
 
-	err := p.writeHeader(out)
+	err := c.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -75,17 +87,20 @@ func TestPatternWriteHeader3(t *testing.T) {
 }
 
 func TestPatternWriteHeader4(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       true,
 		writeDescriptions: false,
 		writeFileNames:    true,
-		bases:             "ATat",
-	}
+		patterns: []pattern{
+			{
+				stat:  "count",
+				bases: "ATat",
+			},
+		}}
 	out := bytes.NewBuffer(make([]byte, 0))
 	desiredResult := "file\trecord\tATat_count\n"
 
-	err := p.writeHeader(out)
+	err := c.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -96,18 +111,25 @@ func TestPatternWriteHeader4(t *testing.T) {
 	}
 }
 
-func TestPatternWriteHeader5(t *testing.T) {
-	p := pattern{
+func TestPatternWriteHeader6(t *testing.T) {
+	c := content{
 		perFile:           true,
-		writeCounts:       true,
 		writeDescriptions: false,
 		writeFileNames:    true,
-		bases:             "ATat",
-	}
+		patterns: []pattern{
+			{
+				stat:  "prop",
+				bases: "ATat",
+			},
+			{
+				stat:  "count",
+				bases: "ATat",
+			},
+		}}
 	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tATat_count\n"
+	desiredResult := "file\tATat_prop\tATat_count\n"
 
-	err := p.writeHeader(out)
+	err := c.writeHeader(out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -119,12 +141,16 @@ func TestPatternWriteHeader5(t *testing.T) {
 }
 
 func TestPatternRecords1(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       false,
 		writeDescriptions: false,
 		writeFileNames:    false,
-		bases:             "ATat",
+		patterns: []pattern{
+			{
+				stat:  "prop",
+				bases: "ATat",
+			},
+		},
 	}
 	fastaFile := []byte(`>Seq1
 ATGATG
@@ -137,7 +163,7 @@ Seq2	0.833333
 `
 	out := bytes.NewBuffer(make([]byte, 0))
 
-	err := patternRecords("stdin", reader, p, out)
+	err := contentRecords("stdin", reader, c, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -149,12 +175,16 @@ Seq2	0.833333
 }
 
 func TestPatternRecords2(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       false,
 		writeDescriptions: false,
 		writeFileNames:    false,
-		bases:             "GCgc",
+		patterns: []pattern{
+			{
+				stat:  "prop",
+				bases: "GCgc",
+			},
+		},
 	}
 	fastaFile := []byte(`>Seq1
 ATGATG
@@ -167,7 +197,7 @@ Seq2	0.000000
 `
 	out := bytes.NewBuffer(make([]byte, 0))
 
-	err := patternRecords("stdin", reader, p, out)
+	err := contentRecords("stdin", reader, c, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -179,12 +209,16 @@ Seq2	0.000000
 }
 
 func TestPatternRecords3(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           true,
-		writeCounts:       false,
 		writeDescriptions: false,
 		writeFileNames:    false,
-		bases:             "ATat",
+		patterns: []pattern{
+			{
+				stat:  "prop",
+				bases: "ATat",
+			},
+		},
 	}
 	fastaFile := []byte(`>Seq1
 ATGATG
@@ -196,7 +230,7 @@ ATTAT-
 `
 	out := bytes.NewBuffer(make([]byte, 0))
 
-	err := patternRecords("stdin", reader, p, out)
+	err := contentRecords("stdin", reader, c, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -208,12 +242,16 @@ ATTAT-
 }
 
 func TestPatternRecords4(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       true,
 		writeDescriptions: false,
 		writeFileNames:    false,
-		bases:             "ATat",
+		patterns: []pattern{
+			{
+				stat:  "count",
+				bases: "ATat",
+			},
+		},
 	}
 	fastaFile := []byte(`>Seq1
 ATGATG
@@ -226,7 +264,7 @@ Seq2	5
 `
 	out := bytes.NewBuffer(make([]byte, 0))
 
-	err := patternRecords("stdin", reader, p, out)
+	err := contentRecords("stdin", reader, c, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -238,12 +276,16 @@ Seq2	5
 }
 
 func TestPatternRecords5(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           true,
-		writeCounts:       true,
 		writeDescriptions: false,
 		writeFileNames:    false,
-		bases:             "ATat",
+		patterns: []pattern{
+			{
+				stat:  "count",
+				bases: "ATat",
+			},
+		},
 	}
 	fastaFile := []byte(`>Seq1
 ATGATG
@@ -255,7 +297,7 @@ ATTAT-
 `
 	out := bytes.NewBuffer(make([]byte, 0))
 
-	err := patternRecords("stdin", reader, p, out)
+	err := contentRecords("stdin", reader, c, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -267,13 +309,16 @@ ATTAT-
 }
 
 func TestPatternRecords6(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       true,
 		writeDescriptions: false,
 		writeFileNames:    true,
-		bases:             "ATat",
-	}
+		patterns: []pattern{
+			{
+				stat:  "count",
+				bases: "ATat",
+			},
+		}}
 	fastaFile := []byte(`>Seq1
 ATGATG
 >Seq2
@@ -285,7 +330,7 @@ my.fasta	Seq2	5
 `
 	out := bytes.NewBuffer(make([]byte, 0))
 
-	err := patternRecords("/path/to/my.fasta", reader, p, out)
+	err := contentRecords("/path/to/my.fasta", reader, c, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -297,12 +342,16 @@ my.fasta	Seq2	5
 }
 
 func TestPatternRecords7(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       true,
 		writeDescriptions: true,
 		writeFileNames:    false,
-		bases:             "ATat",
+		patterns: []pattern{
+			{
+				stat:  "count",
+				bases: "ATat",
+			},
+		},
 	}
 	fastaFile := []byte(`>Seq1 Homo_sapiens
 ATGATG
@@ -315,7 +364,7 @@ Seq2 Danio_rerio	5
 `
 	out := bytes.NewBuffer(make([]byte, 0))
 
-	err := patternRecords("/path/to/my.fasta", reader, p, out)
+	err := contentRecords("/path/to/my.fasta", reader, c, out)
 	if err != nil {
 		t.Error(err)
 	}
@@ -327,13 +376,16 @@ Seq2 Danio_rerio	5
 }
 
 func TestPatternRecords8(t *testing.T) {
-	p := pattern{
+	c := content{
 		perFile:           false,
-		writeCounts:       true,
 		writeDescriptions: true,
 		writeFileNames:    true,
-		bases:             "ATGCatgc",
-	}
+		patterns: []pattern{
+			{
+				stat:  "count",
+				bases: "ATatGCgc",
+			},
+		}}
 	fastaFile := []byte(`>Seq1 Homo_sapiens
 ATGATG
 >Seq2 Danio_rerio
@@ -345,7 +397,49 @@ my.fasta	Seq2 Danio_rerio	5
 `
 	out := bytes.NewBuffer(make([]byte, 0))
 
-	err := patternRecords("/path/to/my.fasta", reader, p, out)
+	err := contentRecords("/path/to/my.fasta", reader, c, out)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
+
+func TestPatternRecords9(t *testing.T) {
+	c := content{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		patterns: []pattern{
+			{
+				stat:  "prop",
+				bases: "ATatGCgc",
+			},
+			{
+				stat:  "prop",
+				bases: "GCgc",
+			},
+			{
+				stat:  "count",
+				bases: "GCgc",
+			},
+		},
+	}
+	fastaFile := []byte(`>Seq1 Homo_sapiens
+ATGATG
+>Seq2 Danio_rerio
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `Seq1	1.000000	0.333333	2
+Seq2	0.833333	0.000000	0
+`
+	out := bytes.NewBuffer(make([]byte, 0))
+
+	err := contentRecords("/path/to/my.fasta", reader, c, out)
 	if err != nil {
 		t.Error(err)
 	}

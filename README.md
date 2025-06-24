@@ -67,7 +67,7 @@ chrX	0.392343
 ```
 
 ```
-❯ fastats content -b AG GRCh38.p14.genome.fa | head
+❯ fastats content -p AG GRCh38.p14.genome.fa | head
 record	AG_prop
 chr1	0.462659
 chr2	0.496471
@@ -90,6 +90,7 @@ Usage:
   fastats [command]
 
 Available Commands:
+  assembly    Assembly statistics
   at          AT content
   atgc        ATGC content
   content     Arbitrary base content
@@ -103,12 +104,8 @@ Available Commands:
   soft        Softmasked content
 
 Flags:
-  -c, --count         print base content counts (default is proportions)
-  -d, --description   print record descriptions (default is IDs)
-  -f, --file          calculate statistics per file (default is per record)
-      --fn            always print a filename column
-  -h, --help          help for fastats
-  -v, --version       version for fastats
+  -h, --help      help for fastats
+  -v, --version   version for fastats
 
 Use "fastats [command] --help" for more information about a command.
 ```
