@@ -154,9 +154,15 @@ func resolveCommandLine(files []string) ([]string, error) {
 }
 
 var contentCmd = &cobra.Command{
-	Use:   "content -c BASES -p BASES <infile[s]>",
+	Use:   "content [-c BASES -p BASES] <infile[s]>",
 	Short: "Arbitrary base content",
-	Long: `e.g. fastats content -p GC -c GC -p AT -c AT <infile[s]>
+	Long: `Arbitrary base content
+	
+Default stats when no arguments provided are: GC content, AT content, N content, gap content
+
+Use any combination of the -c and -p flags to override the defaults, e.g.:
+
+fastats content -p GC -c GC -p AT -c AT <infile[s]>
 
 Arguments provided to -p and -c are case-sensitive, so to calculate gc-content for
 certain, use, e.g. -p GCgc
@@ -167,9 +173,6 @@ certain, use, e.g. -p GCgc
 		if err != nil {
 			return err
 		}
-		if len(cs) == 0 && len(ps) == 0 {
-			return errors.New("specify arguments to -p and/or -c")
-		}
 		c := content{
 			inputs:            files,
 			perFile:           f,
@@ -177,17 +180,39 @@ certain, use, e.g. -p GCgc
 			writeFileNames:    fn,
 			patterns:          make([]pattern, 0),
 		}
-		for _, bases := range ps {
-			c.patterns = append(c.patterns, pattern{
-				stat:  "prop",
-				bases: bases,
-			})
-		}
-		for _, bases := range cs {
-			c.patterns = append(c.patterns, pattern{
-				stat:  "count",
-				bases: bases,
-			})
+		switch {
+		case len(ps) > 0, len(cs) > 0:
+			for _, bases := range ps {
+				c.patterns = append(c.patterns, pattern{
+					stat:  "prop",
+					bases: bases,
+				})
+			}
+			for _, bases := range cs {
+				c.patterns = append(c.patterns, pattern{
+					stat:  "count",
+					bases: bases,
+				})
+			}
+		default:
+			c.patterns = []pattern{
+				{
+					stat:  "prop",
+					bases: "GCgc",
+				},
+				{
+					stat:  "prop",
+					bases: "ATat",
+				},
+				{
+					stat:  "prop",
+					bases: "Nn",
+				},
+				{
+					stat:  "prop",
+					bases: "-",
+				},
+			}
 		}
 		err = c.writeHeader(os.Stdout)
 		if err != nil {
@@ -490,7 +515,7 @@ var nameCmd = &cobra.Command{
 }
 
 var assemblyCmd = &cobra.Command{
-	Use:   "assembly <infile[s]>",
+	Use:   "assembly [-N50 -L50 -G50 [-g int]] <infile[s]>",
 	Short: "Assembly statistics",
 	Long: `Assembly statistics
 
@@ -502,6 +527,7 @@ fastats assembly --N50 --N90 --NG50 --NG90 -g 3000000000 <infile[s]>
 `,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
+
 		files, err = resolveCommandLine(files)
 		if err != nil {
 			return err
@@ -538,12 +564,12 @@ fastats assembly --N50 --N90 --NG50 --NG90 -g 3000000000 <infile[s]>
 					sValue: 50,
 				},
 				{
-					sType:  "L",
-					sValue: 50,
-				},
-				{
 					sType:  "N",
 					sValue: 90,
+				},
+				{
+					sType:  "L",
+					sValue: 50,
 				},
 				{
 					sType:  "L",
