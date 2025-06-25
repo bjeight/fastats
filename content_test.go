@@ -449,3 +449,35 @@ Seq2	0.833333	0.000000	0
 		t.Fail()
 	}
 }
+
+func TestPatternRecords10(t *testing.T) {
+	c := content{
+		perFile:           true,
+		writeDescriptions: false,
+		writeFileNames:    true,
+		patterns: []pattern{
+			{
+				stat:  "count",
+				bases: "ATatGCgc",
+			},
+		}}
+	fastaFile := []byte(`>Seq1 Homo_sapiens
+ATGATG
+>Seq2 Danio_rerio
+ATTAT-
+`)
+	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	desiredResult := `my.fasta	11
+`
+	out := bytes.NewBuffer(make([]byte, 0))
+
+	err := contentRecords("/path/to/my.fasta", reader, c, out)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}

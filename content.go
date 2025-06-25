@@ -95,16 +95,10 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 		for _, nuc := range record.Seq {
 			lookup[nuc] += 1
 		}
-		if args.writeFileNames {
-			_, err = w.Write([]byte(returnFileName(inputPath)))
+		if args.writeFileNames && !args.perFile {
+			_, err = w.Write([]byte(returnFileName(inputPath) + "\t"))
 			if err != nil {
 				return err
-			}
-			if !args.perFile {
-				_, err = w.Write([]byte("\t"))
-				if err != nil {
-					return err
-				}
 			}
 		}
 		if !args.perFile {
