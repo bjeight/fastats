@@ -13,6 +13,7 @@ type assembly struct {
 	inputs     []string            // input files
 	stats      []assemblyStatistic //
 	genomeSize int                 //genome size to use when calculating NG-statistics
+	lenFormat  string
 }
 
 type assemblyStatistic struct {
@@ -33,6 +34,16 @@ func (args assembly) writeHeader(w io.Writer) error {
 		_, err := w.Write([]byte("\t" + stat.string()))
 		if err != nil {
 			return err
+		}
+		switch stat.sType {
+		case "N", "NG":
+			switch args.lenFormat {
+			case "kb", "mb", "gb":
+				_, err := w.Write([]byte("_" + args.lenFormat))
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	_, err = w.Write([]byte("\n"))
@@ -80,13 +91,13 @@ func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writ
 		switch stat.sType {
 		case "N":
 			nX := nStat(contigLengths, totalLength, stat.sValue)
-			_, err := w.Write([]byte("\t" + strconv.Itoa(nX)))
+			_, err := w.Write([]byte("\t" + returnLengthFormatted(nX, args.lenFormat)))
 			if err != nil {
 				return err
 			}
 		case "NG":
 			nX := nStat(contigLengths, args.genomeSize, stat.sValue)
-			_, err := w.Write([]byte("\t" + strconv.Itoa(nX)))
+			_, err := w.Write([]byte("\t" + returnLengthFormatted(nX, args.lenFormat)))
 			if err != nil {
 				return err
 			}

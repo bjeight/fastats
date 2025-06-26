@@ -66,6 +66,7 @@ func init() {
 	contentCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	contentCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	contentCmd.Flags().Lookup("fn").NoOptDefVal = "true"
+	contentCmd.Flags().SortFlags = false
 
 	atCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	atCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -75,6 +76,7 @@ func init() {
 	atCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	atCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	atCmd.Flags().Lookup("fn").NoOptDefVal = "true"
+	atCmd.Flags().SortFlags = false
 
 	gcCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	gcCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -84,6 +86,7 @@ func init() {
 	gcCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	gcCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	gcCmd.Flags().Lookup("fn").NoOptDefVal = "true"
+	gcCmd.Flags().SortFlags = false
 
 	atgcCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	atgcCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -93,6 +96,7 @@ func init() {
 	atgcCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	atgcCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	atgcCmd.Flags().Lookup("fn").NoOptDefVal = "true"
+	atgcCmd.Flags().SortFlags = false
 
 	softCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	softCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -102,6 +106,7 @@ func init() {
 	softCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	softCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	softCmd.Flags().Lookup("fn").NoOptDefVal = "true"
+	softCmd.Flags().SortFlags = false
 
 	nCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	nCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -111,6 +116,7 @@ func init() {
 	nCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	nCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	nCmd.Flags().Lookup("fn").NoOptDefVal = "true"
+	nCmd.Flags().SortFlags = false
 
 	gapCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	gapCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
@@ -120,6 +126,7 @@ func init() {
 	gapCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	gapCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	gapCmd.Flags().Lookup("fn").NoOptDefVal = "true"
+	gapCmd.Flags().SortFlags = false
 
 	lenCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
 	lenCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
@@ -131,15 +138,25 @@ func init() {
 	lenCmd.Flags().Lookup("mb").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("gb").NoOptDefVal = "true"
 	lenCmd.MarkFlagsMutuallyExclusive("kb", "mb", "gb")
+	lenCmd.Flags().SortFlags = false
 
 	nameCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
 	nameCmd.Flags().Lookup("description").NoOptDefVal = "true"
+	nameCmd.Flags().SortFlags = false
 
 	assemblyCmd.Flags().IntSliceVarP(&nX, "N", "N", make([]int, 0), "arbitrary NX assembly statistics")
 	assemblyCmd.Flags().IntSliceVarP(&lX, "L", "L", make([]int, 0), "arbitrary LX assembly statistics")
 	assemblyCmd.Flags().IntSliceVarP(&ngX, "NG", "G", make([]int, 0), "arbitrary NGX assembly statistics (requires -g)")
 	assemblyCmd.Flags().IntVarP(&gS, "genomesize", "g", -1, "genome size in bases")
 	assemblyCmd.MarkFlagsRequiredTogether("NG", "genomesize")
+	assemblyCmd.Flags().BoolVarP(&kb, "kb", "", false, "print N and NG stats in kilobases")
+	assemblyCmd.Flags().BoolVarP(&mb, "mb", "", false, "print N and NG stats in megabases")
+	assemblyCmd.Flags().BoolVarP(&gb, "gb", "", false, "print N and NG stats in gigabases")
+	assemblyCmd.Flags().Lookup("kb").NoOptDefVal = "true"
+	assemblyCmd.Flags().Lookup("mb").NoOptDefVal = "true"
+	assemblyCmd.Flags().Lookup("gb").NoOptDefVal = "true"
+	assemblyCmd.MarkFlagsMutuallyExclusive("kb", "mb", "gb")
+	assemblyCmd.Flags().SortFlags = false
 
 }
 
@@ -527,15 +544,32 @@ fastats assembly --N50 --N90 --NG50 --NG90 -g 3000000000 <infile[s]>
 `,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
-
 		files, err = resolveCommandLine(files)
 		if err != nil {
 			return err
 		}
+		formatCount := 0
+		lenFormat := "b"
+		if kb {
+			formatCount += 1
+			lenFormat = "kb"
+		}
+		if mb {
+			formatCount += 1
+			lenFormat = "mb"
+		}
+		if gb {
+			formatCount += 1
+			lenFormat = "gb"
+		}
+		// if formatCount > 1 {
+		// 	return errors.New("Choose one of --kb, --mb, or --gb")
+		// }
 		a := assembly{
 			inputs:     files,
 			stats:      make([]assemblyStatistic, 0),
 			genomeSize: gS,
+			lenFormat:  lenFormat,
 		}
 		switch {
 		case len(nX) > 0, len(lX) > 0, len(ngX) > 0:
