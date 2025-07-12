@@ -57,27 +57,19 @@ Pre.softmasked.fasta	0.535700
 ```
 
 ```
-❯ bgzip -d -c GRCh38.p14.genome.fa.bgz | fastats gc | grep "Y"
+❯ bgzip -d -c GRCh38.primary_assembly.genome.bgz | fastats gc | grep "Y"
 chrY	0.184749
 ```
 
 ```
-❯ fastats gc GRCh38.p14.genome.fa.bgz | grep "X"
+❯ fastats gc GRCh38.primary_assembly.genome.fa.bgz | grep "X"
 chrX	0.392343
 ```
 
 ```
-❯ fastats content -b AG GRCh38.p14.genome.fa | head
-record	AG_prop
-chr1	0.462659
-chr2	0.496471
-chr3	0.499423
-chr4	0.498870
-chr5	0.498951
-chr6	0.497985
-chr7	0.498520
-chr8	0.499091
-chr9	0.440096
+❯ fastats assembly GRCh38.primary_assembly.genome.fa
+file  N50 N90 L50 L90
+GRCh38.primary_assembly.genome.fa	145138636	80373285	9	19
 ```
 
 ### Help
@@ -90,6 +82,7 @@ Usage:
   fastats [command]
 
 Available Commands:
+  assembly    Assembly statistics
   at          AT content
   atgc        ATGC content
   content     Arbitrary base content
@@ -103,12 +96,8 @@ Available Commands:
   soft        Softmasked content
 
 Flags:
-  -c, --count         print base content counts (default is proportions)
-  -d, --description   print record descriptions (default is IDs)
-  -f, --file          calculate statistics per file (default is per record)
-      --fn            always print a filename column
-  -h, --help          help for fastats
-  -v, --version       version for fastats
+  -h, --help      help for fastats
+  -v, --version   version for fastats
 
 Use "fastats [command] --help" for more information about a command.
 ```

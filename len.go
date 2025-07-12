@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"strconv"
 
 	"github.com/bjeight/fastats/fasta"
 )
@@ -90,7 +89,7 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) 
 					return err
 				}
 			}
-			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.writeDescriptions), returnRecordLength(len(record.Seq), args.lenFormat))
+			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.writeDescriptions), returnLengthFormatted(len(record.Seq), args.lenFormat))
 			_, err = w.Write([]byte(s))
 			if err != nil {
 				return err
@@ -101,7 +100,7 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) 
 	// if the statistic is to be calculated per file, we print the total after all
 	// the records have been processed
 	if args.perFile {
-		s := fmt.Sprintf("%s\t%s\n", returnFileName(inputPath), returnRecordLength(l_total, args.lenFormat))
+		s := fmt.Sprintf("%s\t%s\n", returnFileName(inputPath), returnLengthFormatted(l_total, args.lenFormat))
 		_, err := w.Write([]byte(s))
 		if err != nil {
 			return err
@@ -109,20 +108,4 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) 
 	}
 
 	return nil
-}
-
-// returnRecordLength (potentially) converts bases to kb, mb, gb.
-func returnRecordLength(l int, unit string) string {
-	var s string
-	switch unit {
-	case "kb":
-		s = strconv.FormatFloat(float64(l)/float64(1000), 'f', 3, 64)
-	case "mb":
-		s = strconv.FormatFloat(float64(l)/float64(1000000), 'f', 6, 64)
-	case "gb":
-		s = strconv.FormatFloat(float64(l)/float64(1000000000), 'f', 9, 64)
-	default:
-		s = strconv.Itoa(l)
-	}
-	return s
 }
