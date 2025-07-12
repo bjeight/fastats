@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"strconv"
 
 	"github.com/bjeight/fastats/fasta"
 )
@@ -109,20 +108,4 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) 
 	}
 
 	return nil
-}
-
-// returnRecordLength (potentially) converts bases to kb, mb, gb.
-func returnLengthFormatted(l int, unit string) string {
-	var s string
-	switch unit {
-	case "kb":
-		s = strconv.FormatFloat(float64(l)/float64(1000), 'f', 3, 64)
-	case "mb":
-		s = strconv.FormatFloat(float64(l)/float64(1000000), 'f', 6, 64)
-	case "gb":
-		s = strconv.FormatFloat(float64(l)/float64(1000000000), 'f', 9, 64)
-	default:
-		s = strconv.Itoa(l)
-	}
-	return s
 }

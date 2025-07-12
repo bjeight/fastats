@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -454,22 +453,15 @@ var lenCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		formatCount := 0
 		lenFormat := "b"
 		if kb {
-			formatCount += 1
 			lenFormat = "kb"
 		}
 		if mb {
-			formatCount += 1
 			lenFormat = "mb"
 		}
 		if gb {
-			formatCount += 1
 			lenFormat = "gb"
-		}
-		if formatCount > 1 {
-			return errors.New("Choose one of --kb, --mb, or --gb")
 		}
 		l := length{
 			inputs:            files,
@@ -548,23 +540,16 @@ fastats assembly --N50 --N90 --NG50 --NG90 -g 3000000000 <infile[s]>
 		if err != nil {
 			return err
 		}
-		formatCount := 0
 		lenFormat := "b"
 		if kb {
-			formatCount += 1
 			lenFormat = "kb"
 		}
 		if mb {
-			formatCount += 1
 			lenFormat = "mb"
 		}
 		if gb {
-			formatCount += 1
 			lenFormat = "gb"
 		}
-		// if formatCount > 1 {
-		// 	return errors.New("Choose one of --kb, --mb, or --gb")
-		// }
 		a := assembly{
 			inputs:     files,
 			stats:      make([]assemblyStatistic, 0),

@@ -17,9 +17,8 @@ type content struct {
 }
 
 type pattern struct {
-	stat    string // {prop, count} - proportions or counts
-	bases   string // arbitrary base content to apply the content functionality to
-	n_total int    // count of this number of bases in a file
+	stat  string // {prop, count} - proportions or counts
+	bases string // arbitrary base content to apply the content functionality to
 }
 
 func (p *pattern) string() string {
@@ -79,6 +78,12 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 	// initiate a count for the total length of the file
 	l_total := 0
 
+	// initiate counts for each pattern
+	n_totals := make([]int, len(args.patterns))
+	for i := range args.patterns {
+		n_totals[i] = 0
+	}
+
 	// iterate over every record in the fasta file
 	for {
 		record, err := r.Read()
@@ -108,7 +113,7 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 			}
 		}
 
-		// iterate over all the base contents to be counted
+		// iterate over all the patterns to be counted
 		for i, p := range args.patterns {
 			n := 0
 			for _, b := range []byte(p.bases) {
@@ -118,7 +123,7 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 			// if the statistic is to be calculated per file, add this record's content count
 			// and length to the total, else write this records statistic.
 			if args.perFile {
-				args.patterns[i].n_total += n
+				n_totals[i] += n
 			} else {
 				// print a count or a proportion
 				switch p.stat {
@@ -151,15 +156,15 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 		if err != nil {
 			return err
 		}
-		for _, p := range args.patterns {
+		for i, p := range args.patterns {
 			switch p.stat {
 			case "count":
-				_, err := w.Write([]byte("\t" + strconv.Itoa(p.n_total)))
+				_, err := w.Write([]byte("\t" + strconv.Itoa(n_totals[i])))
 				if err != nil {
 					return err
 				}
 			case "prop":
-				proportion := float64(p.n_total) / float64(l_total)
+				proportion := float64(n_totals[i]) / float64(l_total)
 				_, err := w.Write([]byte("\t" + strconv.FormatFloat(proportion, 'f', 6, 64)))
 				if err != nil {
 					return err
