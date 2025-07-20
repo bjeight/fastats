@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -11,7 +13,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.9.0",
+		Version:           "0.9.1",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -41,6 +43,8 @@ var (
 	ngX []int
 	lX  []int
 	gS  int
+
+	out io.Writer = os.Stdout
 )
 
 func init() {
@@ -136,7 +140,6 @@ func init() {
 	lenCmd.Flags().Lookup("kb").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("mb").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("gb").NoOptDefVal = "true"
-	lenCmd.MarkFlagsMutuallyExclusive("kb", "mb", "gb")
 	lenCmd.Flags().SortFlags = false
 
 	nameCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
@@ -154,7 +157,6 @@ func init() {
 	assemblyCmd.Flags().Lookup("kb").NoOptDefVal = "true"
 	assemblyCmd.Flags().Lookup("mb").NoOptDefVal = "true"
 	assemblyCmd.Flags().Lookup("gb").NoOptDefVal = "true"
-	assemblyCmd.MarkFlagsMutuallyExclusive("kb", "mb", "gb")
 	assemblyCmd.Flags().SortFlags = false
 
 }
@@ -167,6 +169,26 @@ func resolveCommandLine(files []string) ([]string, error) {
 		files = []string{"stdin"}
 	}
 	return files, nil
+}
+
+func lenMutuallyExclusive(kb, mb, gb bool) (string, error) {
+	set := make([]string, 0)
+	if kb {
+		set = append(set, "kb")
+	}
+	if mb {
+		set = append(set, "mb")
+	}
+	if gb {
+		set = append(set, "gb")
+	}
+	if len(set) > 1 {
+		return "", errors.New("flags --kb, --mb, and --gb are mutually exclusive")
+	}
+	if len(set) == 1 {
+		return set[0], nil
+	}
+	return "b", nil
 }
 
 var contentCmd = &cobra.Command{
@@ -230,11 +252,11 @@ certain, use, e.g. -p GCgc
 				},
 			}
 		}
-		err = c.writeHeader(os.Stdout)
+		err = c.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = c.writeBody(os.Stdout)
+		err = c.writeBody(out)
 		return err
 	},
 }
@@ -264,11 +286,11 @@ var atCmd = &cobra.Command{
 				},
 			},
 		}
-		err = p.writeHeader(os.Stdout)
+		err = p.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(os.Stdout)
+		err = p.writeBody(out)
 		return err
 	},
 }
@@ -298,11 +320,11 @@ var gcCmd = &cobra.Command{
 				},
 			},
 		}
-		err = p.writeHeader(os.Stdout)
+		err = p.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(os.Stdout)
+		err = p.writeBody(out)
 		return err
 	},
 }
@@ -332,11 +354,11 @@ var atgcCmd = &cobra.Command{
 				},
 			},
 		}
-		err = p.writeHeader(os.Stdout)
+		err = p.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(os.Stdout)
+		err = p.writeBody(out)
 		return err
 	},
 }
@@ -366,11 +388,11 @@ var nCmd = &cobra.Command{
 				},
 			},
 		}
-		err = p.writeHeader(os.Stdout)
+		err = p.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(os.Stdout)
+		err = p.writeBody(out)
 		return err
 	},
 }
@@ -400,11 +422,11 @@ var gapCmd = &cobra.Command{
 				},
 			},
 		}
-		err = p.writeHeader(os.Stdout)
+		err = p.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(os.Stdout)
+		err = p.writeBody(out)
 		return err
 	},
 }
@@ -434,11 +456,11 @@ var softCmd = &cobra.Command{
 				},
 			},
 		}
-		err = p.writeHeader(os.Stdout)
+		err = p.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(os.Stdout)
+		err = p.writeBody(out)
 		return err
 	},
 }
@@ -453,15 +475,9 @@ var lenCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		lenFormat := "b"
-		if kb {
-			lenFormat = "kb"
-		}
-		if mb {
-			lenFormat = "mb"
-		}
-		if gb {
-			lenFormat = "gb"
+		lenFormat, err := lenMutuallyExclusive(kb, mb, gb)
+		if err != nil {
+			return err
 		}
 		l := length{
 			inputs:            files,
@@ -470,11 +486,11 @@ var lenCmd = &cobra.Command{
 			writeFileNames:    fn,
 			lenFormat:         lenFormat,
 		}
-		err = l.writeHeader(os.Stdout)
+		err = l.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = l.writeBody(os.Stdout)
+		err = l.writeBody(out)
 		return err
 	},
 }
@@ -492,11 +508,11 @@ var numCmd = &cobra.Command{
 		n := num{
 			inputs: files,
 		}
-		err = n.writeHeader(os.Stdout)
+		err = n.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = n.writeBody(os.Stdout)
+		err = n.writeBody(out)
 		return err
 	},
 }
@@ -514,11 +530,11 @@ var nameCmd = &cobra.Command{
 			inputs:            files,
 			writeDescriptions: d,
 		}
-		err = n.writeHeader(os.Stdout)
+		err = n.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = n.writeBody(os.Stdout)
+		err = n.writeBody(out)
 		return err
 	},
 }
@@ -540,15 +556,9 @@ fastats assembly --N50 --N90 --NG50 --NG90 -g 3000000000 <infile[s]>
 		if err != nil {
 			return err
 		}
-		lenFormat := "b"
-		if kb {
-			lenFormat = "kb"
-		}
-		if mb {
-			lenFormat = "mb"
-		}
-		if gb {
-			lenFormat = "gb"
+		lenFormat, err := lenMutuallyExclusive(kb, mb, gb)
+		if err != nil {
+			return err
 		}
 		a := assembly{
 			inputs:     files,
@@ -597,11 +607,11 @@ fastats assembly --N50 --N90 --NG50 --NG90 -g 3000000000 <infile[s]>
 			}
 		}
 
-		err = a.writeHeader(os.Stdout)
+		err = a.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = a.writeBody(os.Stdout)
+		err = a.writeBody(out)
 		return err
 	},
 }
