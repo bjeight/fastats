@@ -17,12 +17,23 @@ type content struct {
 }
 
 type pattern struct {
-	stat  string // {prop, count} - proportions or counts
-	bases string // arbitrary base content to apply the content functionality to
+	stat         string // {prop, count} - proportions or counts
+	bases        string // arbitrary base content to apply the content functionality to
+	headerPrefix string // header prefix for the output column
+	inverse      bool   // count bases that are NOT the given content
 }
 
-func (p *pattern) string() string {
-	return p.bases + "_" + p.stat
+func (p *pattern) header() string {
+	s := ""
+	if p.inverse {
+		s += "!"
+	}
+	if len(p.headerPrefix) == 0 {
+		s += p.bases + "_" + p.stat
+	} else {
+		s += p.headerPrefix + "_" + p.stat
+	}
+	return s
 }
 
 func (args content) writeHeader(w io.Writer) error {
@@ -45,7 +56,7 @@ func (args content) writeHeader(w io.Writer) error {
 		}
 	}
 	for _, p := range args.patterns {
-		_, err := w.Write([]byte("\t" + p.string()))
+		_, err := w.Write([]byte("\t" + p.header()))
 		if err != nil {
 			return err
 		}
@@ -118,6 +129,9 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 			n := 0
 			for _, b := range []byte(p.bases) {
 				n += lookup[b]
+			}
+			if p.inverse {
+				n = len(record.Seq) - n
 			}
 
 			// if the statistic is to be calculated per file, add this record's content count

@@ -23,7 +23,7 @@ AT
 	fastaR := bytes.NewReader(fastaData)
 	r := NewReader(fastaR)
 
-	desiredResult := Record{
+	expected := Record{
 		ID:          "seq1",
 		Description: "seq1",
 		Seq:         []byte("ATGC"),
@@ -32,12 +32,12 @@ AT
 	if err != nil {
 		t.Error(err)
 	}
-	if !reflect.DeepEqual(record, desiredResult) {
+	if !reflect.DeepEqual(record, expected) {
 		fmt.Println(record)
 		t.Errorf("problem in TestRead(seq1)")
 	}
 
-	desiredResult = Record{
+	expected = Record{
 		ID:          "seq2",
 		Description: "seq2 something",
 		Seq:         []byte("ATG-ATG-ATGCATGCATGC"),
@@ -46,12 +46,12 @@ AT
 	if err != nil {
 		t.Error(err)
 	}
-	if !reflect.DeepEqual(record, desiredResult) {
+	if !reflect.DeepEqual(record, expected) {
 		fmt.Println(record)
 		t.Errorf("problem in TestRead(seq2)")
 	}
 
-	desiredResult = Record{
+	expected = Record{
 		ID:          "seq3",
 		Description: "seq3",
 		Seq:         []byte("AT"),
@@ -60,17 +60,17 @@ AT
 	if err != nil {
 		t.Error(err)
 	}
-	if !reflect.DeepEqual(record, desiredResult) {
+	if !reflect.DeepEqual(record, expected) {
 		fmt.Println(record)
 		t.Errorf("problem in TestRead(seq3)")
 	}
 
-	desiredResult = Record{}
+	expected = Record{}
 	record, err = r.Read()
 	if !errors.Is(err, io.EOF) {
 		t.Error(err)
 	}
-	if !reflect.DeepEqual(record, desiredResult) {
+	if !reflect.DeepEqual(record, expected) {
 		fmt.Println(record)
 		t.Errorf("problem in TestRead(last read)")
 	}

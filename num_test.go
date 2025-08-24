@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	"github.com/bjeight/fastats/fasta"
@@ -10,17 +9,16 @@ import (
 
 func TestNumWriteHeader(t *testing.T) {
 	n := num{}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tn_records\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tn_records\n"
 
-	err := n.writeHeader(out)
+	err := n.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output.String())
 	}
 }
 
@@ -32,17 +30,16 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	2
+	expected := `stdin	2
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := numRecords("stdin", reader, n, out)
+	err := numRecords("stdin", reader, n, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output.String())
 	}
 }

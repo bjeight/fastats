@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	"github.com/bjeight/fastats/fasta"
@@ -15,17 +14,16 @@ func TestLengthWriteHeader1(t *testing.T) {
 		writeFileNames:    false,
 		lenFormat:         "b",
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "record\tlength\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "record\tlength\n"
 
-	err := l.writeHeader(out)
+	err := l.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -36,17 +34,16 @@ func TestLengthWriteHeader2(t *testing.T) {
 		writeFileNames:    false,
 		lenFormat:         "kb",
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "record\tlength_kb\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "record\tlength_kb\n"
 
-	err := l.writeHeader(out)
+	err := l.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -57,17 +54,16 @@ func TestLengthWriteHeader3(t *testing.T) {
 		writeFileNames:    false,
 		lenFormat:         "mb",
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "record\tlength_mb\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "record\tlength_mb\n"
 
-	err := l.writeHeader(out)
+	err := l.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -78,17 +74,16 @@ func TestLengthWriteHeader4(t *testing.T) {
 		writeFileNames:    false,
 		lenFormat:         "gb",
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "record\tlength_gb\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "record\tlength_gb\n"
 
-	err := l.writeHeader(out)
+	err := l.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -99,17 +94,16 @@ func TestLengthWriteHeader5(t *testing.T) {
 		writeFileNames:    false,
 		lenFormat:         "",
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tlength\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tlength\n"
 
-	err := l.writeHeader(out)
+	err := l.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -120,17 +114,16 @@ func TestLengthWriteHeader6(t *testing.T) {
 		writeFileNames:    true,
 		lenFormat:         "",
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\trecord\tlength\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\trecord\tlength\n"
 
-	err := l.writeHeader(out)
+	err := l.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -147,19 +140,18 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `Seq1	6
+	expected := `Seq1	6
 Seq2	6
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := lengthRecords("stdin", reader, l, out)
+	err := lengthRecords("stdin", reader, l, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -176,18 +168,17 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	12
+	expected := `stdin	12
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := lengthRecords("stdin", reader, l, out)
+	err := lengthRecords("stdin", reader, l, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -204,19 +195,18 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `Seq1 Homo_sapiens	6
+	expected := `Seq1 Homo_sapiens	6
 Seq2 Danio_rerio	6
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := lengthRecords("/path/to/test.fa", reader, l, out)
+	err := lengthRecords("/path/to/test.fa", reader, l, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -233,18 +223,17 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `test.fa	Seq1 Homo_sapiens	6
+	expected := `test.fa	Seq1 Homo_sapiens	6
 test.fa	Seq2 Danio_rerio	6
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := lengthRecords("/path/to/test.fa", reader, l, out)
+	err := lengthRecords("/path/to/test.fa", reader, l, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }

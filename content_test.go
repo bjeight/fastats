@@ -8,7 +8,7 @@ import (
 	"github.com/bjeight/fastats/fasta"
 )
 
-func TestPatternWriteHeader1(t *testing.T) {
+func TestContentWriteHeader1(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: false,
@@ -34,7 +34,7 @@ func TestPatternWriteHeader1(t *testing.T) {
 	}
 }
 
-func TestPatternWriteHeader2(t *testing.T) {
+func TestContentWriteHeader2(t *testing.T) {
 	c := content{
 		perFile:           true,
 		writeDescriptions: false,
@@ -60,7 +60,7 @@ func TestPatternWriteHeader2(t *testing.T) {
 	}
 }
 
-func TestPatternWriteHeader3(t *testing.T) {
+func TestContentWriteHeader3(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: false,
@@ -86,7 +86,7 @@ func TestPatternWriteHeader3(t *testing.T) {
 	}
 }
 
-func TestPatternWriteHeader4(t *testing.T) {
+func TestContentWriteHeader4(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: false,
@@ -111,7 +111,7 @@ func TestPatternWriteHeader4(t *testing.T) {
 	}
 }
 
-func TestPatternWriteHeader6(t *testing.T) {
+func TestContentWriteHeader5(t *testing.T) {
 	c := content{
 		perFile:           true,
 		writeDescriptions: false,
@@ -140,7 +140,67 @@ func TestPatternWriteHeader6(t *testing.T) {
 	}
 }
 
-func TestPatternRecords1(t *testing.T) {
+func TestContentWriteHeader6(t *testing.T) {
+	c := content{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		patterns: []pattern{
+			{
+				stat:    "prop",
+				bases:   "ATat",
+				inverse: true,
+			},
+			{
+				stat:    "count",
+				bases:   "ATat",
+				inverse: true,
+			},
+		}}
+	out := bytes.NewBuffer(make([]byte, 0))
+	desiredResult := "record\t!ATat_prop\t!ATat_count\n"
+
+	err := c.writeHeader(out)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out.String() != desiredResult {
+		fmt.Print(out.String())
+		t.Fail()
+	}
+}
+
+func TestContentWriteHeader7(t *testing.T) {
+	c := content{
+		perFile:           false,
+		writeDescriptions: false,
+		writeFileNames:    false,
+		patterns: []pattern{
+			{
+				stat:         "prop",
+				bases:        "ATat",
+				headerPrefix: "ATcontent",
+			},
+			{
+				stat:  "count",
+				bases: "ATat",
+			},
+		}}
+
+	expected := "record\tATcontent_prop\tATat_count\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	err := c.writeHeader(output)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
+	}
+}
+
+func TestContentRecords1(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: false,
@@ -158,23 +218,23 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `Seq1	0.666667
+
+	expected := `Seq1	0.666667
 Seq2	0.833333
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("stdin", reader, c, out)
+	err := contentRecords("stdin", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords2(t *testing.T) {
+func TestContentRecords2(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: false,
@@ -192,23 +252,22 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `Seq1	0.333333
+	expected := `Seq1	0.333333
 Seq2	0.000000
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("stdin", reader, c, out)
+	err := contentRecords("stdin", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords3(t *testing.T) {
+func TestContentRecords3(t *testing.T) {
 	c := content{
 		perFile:           true,
 		writeDescriptions: false,
@@ -226,22 +285,21 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	0.750000
+	expected := `stdin	0.750000
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("stdin", reader, c, out)
+	err := contentRecords("stdin", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords4(t *testing.T) {
+func TestContentRecords4(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: false,
@@ -259,23 +317,22 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `Seq1	4
+	expected := `Seq1	4
 Seq2	5
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("stdin", reader, c, out)
+	err := contentRecords("stdin", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords5(t *testing.T) {
+func TestContentRecords5(t *testing.T) {
 	c := content{
 		perFile:           true,
 		writeDescriptions: false,
@@ -293,22 +350,21 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	9
+	expected := `stdin	9
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("stdin", reader, c, out)
+	err := contentRecords("stdin", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords6(t *testing.T) {
+func TestContentRecords6(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: false,
@@ -325,23 +381,22 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `my.fasta	Seq1	4
+	expected := `my.fasta	Seq1	4
 my.fasta	Seq2	5
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("/path/to/my.fasta", reader, c, out)
+	err := contentRecords("/path/to/my.fasta", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords7(t *testing.T) {
+func TestContentRecords7(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: true,
@@ -359,23 +414,22 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `Seq1 Homo_sapiens	4
+	expected := `Seq1 Homo_sapiens	4
 Seq2 Danio_rerio	5
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("/path/to/my.fasta", reader, c, out)
+	err := contentRecords("/path/to/my.fasta", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords8(t *testing.T) {
+func TestContentRecords8(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: true,
@@ -392,23 +446,22 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `my.fasta	Seq1 Homo_sapiens	6
+	expected := `my.fasta	Seq1 Homo_sapiens	6
 my.fasta	Seq2 Danio_rerio	5
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("/path/to/my.fasta", reader, c, out)
+	err := contentRecords("/path/to/my.fasta", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords9(t *testing.T) {
+func TestContentRecords9(t *testing.T) {
 	c := content{
 		perFile:           false,
 		writeDescriptions: false,
@@ -434,23 +487,22 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `Seq1	1.000000	0.333333	2
+	expected := `Seq1	1.000000	0.333333	2
 Seq2	0.833333	0.000000	0
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("/path/to/my.fasta", reader, c, out)
+	err := contentRecords("/path/to/my.fasta", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
-func TestPatternRecords10(t *testing.T) {
+func TestContentRecords10(t *testing.T) {
 	c := content{
 		perFile:           true,
 		writeDescriptions: false,
@@ -467,17 +519,16 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `my.fasta	11
+	expected := `my.fasta	11
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := contentRecords("/path/to/my.fasta", reader, c, out)
+	err := contentRecords("/path/to/my.fasta", reader, c, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }

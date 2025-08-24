@@ -41,10 +41,13 @@ func executeCommandC(root *cobra.Command, args ...string) (c *cobra.Command, out
 func resetFlags() {
 	f = false
 	c = false
+	v = false
 	d = false
 
 	cs = make([]string, 0)
 	ps = make([]string, 0)
+	vcs = make([]string, 0)
+	vps = make([]string, 0)
 
 	fn = false
 
@@ -64,7 +67,7 @@ func TestContentCmd1(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `record	GCgc_prop	ATat_prop	Nn_prop	-_prop
+	expected := `record	GCgc_prop	ATat_prop	Nn_prop	gap_prop
 Seq1	0.333333	0.666667	0.000000	0.000000
 Seq2	0.000000	0.833333	0.000000	0.166667
 `
@@ -81,7 +84,7 @@ func TestContentCmd2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	record	GCgc_prop	ATat_prop	Nn_prop	-_prop
+	expected := `file	record	GCgc_prop	ATat_prop	Nn_prop	gap_prop
 n2b6.fasta	Seq1	0.333333	0.666667	0.000000	0.000000
 n2b6.fasta	Seq2	0.000000	0.833333	0.000000	0.166667
 n2b6.fasta	Seq1	0.333333	0.666667	0.000000	0.000000
@@ -100,9 +103,26 @@ func TestContentCmd3(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	GCgc_prop	ATat_prop	Nn_prop	-_prop
+	expected := `file	GCgc_prop	ATat_prop	Nn_prop	gap_prop
 n2b6.fasta	0.166667	0.750000	0.000000	0.083333
 n2b6.fasta	0.166667	0.750000	0.000000	0.083333
+`
+	if output != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
+	}
+
+	resetFlags()
+}
+
+func TestContentCmd4(t *testing.T) {
+	output, err := executeCommand(rootCmd, "content", "-p=ATat", "--vp=ATat", "testdata/n2b6.fasta")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := `record	ATat_prop	!ATat_prop
+Seq1	0.666667	0.333333
+Seq2	0.833333	0.166667
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -211,6 +231,23 @@ n2b6.fasta	Seq2 Ptroglodytes	5
 	resetFlags()
 }
 
+func TestATCmd7(t *testing.T) {
+	output, err := executeCommand(rootCmd, "at", "testdata/n2b6.fasta", "-v")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := `record	!ATat_prop
+Seq1	0.333333
+Seq2	0.166667
+`
+	if output != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
+	}
+
+	resetFlags()
+}
+
 func TestGCCmd1(t *testing.T) {
 	output, err := executeCommand(rootCmd, "gc", "testdata/n2b6.fasta")
 	if err != nil {
@@ -285,7 +322,7 @@ func TestGapsCmd1(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `record	-_prop
+	expected := `record	gap_prop
 Seq1	0.000000
 Seq2	0.166667
 `
@@ -302,8 +339,42 @@ func TestSoftCmd1(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `record	atgcn_prop
+	expected := `record	soft_prop
 Seq1	0.000000
+Seq2	0.000000
+`
+	if output != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
+	}
+
+	resetFlags()
+}
+
+func TestAmbigCmd1(t *testing.T) {
+	output, err := executeCommand(rootCmd, "ambig", "testdata/ambig.fasta")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := `record	ambig_prop
+Seq1	0.000000
+Seq2	1.000000
+`
+	if output != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
+	}
+
+	resetFlags()
+}
+
+func TestAmbigCmd2(t *testing.T) {
+	output, err := executeCommand(rootCmd, "ambig", "testdata/ambig.fasta", "-v")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := `record	!ambig_prop
+Seq1	1.000000
 Seq2	0.000000
 `
 	if output != expected {

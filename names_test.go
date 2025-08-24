@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	"github.com/bjeight/fastats/fasta"
@@ -12,17 +11,16 @@ func TestNamesWriteHeader1(t *testing.T) {
 	n := names{
 		writeDescriptions: false,
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tid\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tid\n"
 
-	err := n.writeHeader(out)
+	err := n.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output.String())
 	}
 }
 
@@ -30,17 +28,16 @@ func TestNamesWriteHeader2(t *testing.T) {
 	n := names{
 		writeDescriptions: true,
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tdescription\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tdescription\n"
 
-	err := n.writeHeader(out)
+	err := n.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output.String())
 	}
 }
 
@@ -54,19 +51,18 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `file.fasta	Seq1
+	expected := `file.fasta	Seq1
 file.fasta	Seq2
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := namesRecords("/path/to/my/file.fasta", reader, n, out)
+	err := namesRecords("/path/to/my/file.fasta", reader, n, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output.String())
 	}
 }
 
@@ -80,18 +76,17 @@ ATGATG
 ATTAT-
 `)
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `file.fasta	Seq1 Homo_sapiens X
+	expected := `file.fasta	Seq1 Homo_sapiens X
 file.fasta	Seq2 Danio_rerio Y
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := namesRecords("/path/to/my/file.fasta", reader, n, out)
+	err := namesRecords("/path/to/my/file.fasta", reader, n, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output.String())
 	}
 }
