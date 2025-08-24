@@ -13,7 +13,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.9.1",
+		Version:           "0.10.0",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -29,9 +29,12 @@ var (
 	f bool
 	c bool
 	d bool
+	v bool
 
-	cs []string
-	ps []string
+	cs  []string
+	ps  []string
+	vcs []string
+	vps []string
 
 	fn bool
 
@@ -55,17 +58,20 @@ func init() {
 	rootCmd.AddCommand(atgcCmd)
 	rootCmd.AddCommand(nCmd)
 	rootCmd.AddCommand(gapCmd)
+	rootCmd.AddCommand(ambigCmd)
 	rootCmd.AddCommand(softCmd)
 	rootCmd.AddCommand(lenCmd)
 	rootCmd.AddCommand(numCmd)
 	rootCmd.AddCommand(nameCmd)
 	rootCmd.AddCommand(assemblyCmd)
 
-	contentCmd.Flags().StringSliceVarP(&cs, "counts", "c", make([]string, 0), "arbitrary base content counts (case-sensitive)")
-	contentCmd.Flags().StringSliceVarP(&ps, "proportions", "p", make([]string, 0), "arbitrary base content proportions (case-sensitive)")
+	contentCmd.Flags().StringSliceVarP(&cs, "count", "c", make([]string, 0), "comma-separated list of arbitrary base contents to count (case-sensitive)")
+	contentCmd.Flags().StringSliceVarP(&ps, "prop", "p", make([]string, 0), "comma-separated list of arbitrary base contents to get proportions of (case-sensitive)")
+	contentCmd.Flags().StringSliceVar(&vcs, "vc", make([]string, 0), "comma-separated list of inverse arbitrary base contents to count (case-sensitive)")
+	contentCmd.Flags().StringSliceVar(&vps, "vp", make([]string, 0), "comma-separated list of inverse arbitrary base content get proportions of (case-sensitive)")
 	contentCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
 	contentCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	contentCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
+	contentCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
 	contentCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	contentCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	contentCmd.Flags().Lookup("fn").NoOptDefVal = "true"
@@ -73,69 +79,93 @@ func init() {
 
 	atCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	atCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
+	atCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
 	atCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	atCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
+	atCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
 	atCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	atCmd.Flags().Lookup("file").NoOptDefVal = "true"
+	atCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
 	atCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	atCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	atCmd.Flags().SortFlags = false
 
 	gcCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	gcCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
+	gcCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
 	gcCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	gcCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
+	gcCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
 	gcCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	gcCmd.Flags().Lookup("file").NoOptDefVal = "true"
+	gcCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
 	gcCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	gcCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	gcCmd.Flags().SortFlags = false
 
 	atgcCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	atgcCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
+	atgcCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
 	atgcCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	atgcCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
+	atgcCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
 	atgcCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	atgcCmd.Flags().Lookup("file").NoOptDefVal = "true"
+	atgcCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
 	atgcCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	atgcCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	atgcCmd.Flags().SortFlags = false
 
 	softCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	softCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
+	softCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
 	softCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	softCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
+	softCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
 	softCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	softCmd.Flags().Lookup("file").NoOptDefVal = "true"
+	softCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
 	softCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	softCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	softCmd.Flags().SortFlags = false
 
 	nCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	nCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
+	nCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
 	nCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	nCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
+	nCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
 	nCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	nCmd.Flags().Lookup("file").NoOptDefVal = "true"
+	nCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
 	nCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	nCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	nCmd.Flags().SortFlags = false
 
 	gapCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
 	gapCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
+	gapCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
 	gapCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	gapCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
+	gapCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
 	gapCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	gapCmd.Flags().Lookup("file").NoOptDefVal = "true"
+	gapCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
 	gapCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	gapCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	gapCmd.Flags().SortFlags = false
 
+	ambigCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
+	ambigCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
+	ambigCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
+	ambigCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
+	ambigCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	ambigCmd.Flags().Lookup("count").NoOptDefVal = "true"
+	ambigCmd.Flags().Lookup("file").NoOptDefVal = "true"
+	ambigCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
+	ambigCmd.Flags().Lookup("description").NoOptDefVal = "true"
+	ambigCmd.Flags().Lookup("fn").NoOptDefVal = "true"
+	ambigCmd.Flags().SortFlags = false
+
 	lenCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	lenCmd.Flags().BoolVarP(&fn, "fn", "", false, "always print a filename column")
-	lenCmd.Flags().BoolVarP(&kb, "kb", "", false, "print sequence lengths in kilobases")
-	lenCmd.Flags().BoolVarP(&mb, "mb", "", false, "print sequence lengths in megabases")
-	lenCmd.Flags().BoolVarP(&gb, "gb", "", false, "print sequence lengths in gigabases")
+	lenCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	lenCmd.Flags().BoolVar(&kb, "kb", false, "print sequence lengths in kilobases")
+	lenCmd.Flags().BoolVar(&mb, "mb", false, "print sequence lengths in megabases")
+	lenCmd.Flags().BoolVar(&gb, "gb", false, "print sequence lengths in gigabases")
 	lenCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("kb").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("mb").NoOptDefVal = "true"
@@ -151,9 +181,9 @@ func init() {
 	assemblyCmd.Flags().IntSliceVarP(&ngX, "NG", "G", make([]int, 0), "arbitrary NGX assembly statistics (requires -g)")
 	assemblyCmd.Flags().IntVarP(&gS, "genomesize", "g", -1, "genome size in bases")
 	assemblyCmd.MarkFlagsRequiredTogether("NG", "genomesize")
-	assemblyCmd.Flags().BoolVarP(&kb, "kb", "", false, "print N and NG stats in kilobases")
-	assemblyCmd.Flags().BoolVarP(&mb, "mb", "", false, "print N and NG stats in megabases")
-	assemblyCmd.Flags().BoolVarP(&gb, "gb", "", false, "print N and NG stats in gigabases")
+	assemblyCmd.Flags().BoolVar(&kb, "kb", false, "print N and NG stats in kilobases")
+	assemblyCmd.Flags().BoolVar(&mb, "mb", false, "print N and NG stats in megabases")
+	assemblyCmd.Flags().BoolVar(&gb, "gb", false, "print N and NG stats in gigabases")
 	assemblyCmd.Flags().Lookup("kb").NoOptDefVal = "true"
 	assemblyCmd.Flags().Lookup("mb").NoOptDefVal = "true"
 	assemblyCmd.Flags().Lookup("gb").NoOptDefVal = "true"
@@ -198,12 +228,12 @@ var contentCmd = &cobra.Command{
 	
 Default stats when no arguments provided are: GC content, AT content, N content, gap content
 
-Use any combination of the -c and -p flags to override the defaults, e.g.:
+Use any combination of the -c, -p, --vc and --vp flags to override the defaults, e.g.:
 
-fastats content -p GC -c GC -p AT -c AT <infile[s]>
+fastats content -p GC,AT -c GC,AT <infile[s]>
 
-Arguments provided to -p and -c are case-sensitive, so to calculate gc-content for
-certain, use, e.g. -p GCgc
+Arguments provided to -p, -c, --vp, --vc are case-sensitive, so to calculate gc-content for
+certain, use, e.g.: -p GCgc
 `,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
@@ -219,7 +249,7 @@ certain, use, e.g. -p GCgc
 			patterns:          make([]pattern, 0),
 		}
 		switch {
-		case len(ps) > 0, len(cs) > 0:
+		case len(ps) > 0, len(cs) > 0, len(vps) > 0, len(vcs) > 0:
 			for _, bases := range ps {
 				c.patterns = append(c.patterns, pattern{
 					stat:  "prop",
@@ -230,6 +260,20 @@ certain, use, e.g. -p GCgc
 				c.patterns = append(c.patterns, pattern{
 					stat:  "count",
 					bases: bases,
+				})
+			}
+			for _, bases := range vps {
+				c.patterns = append(c.patterns, pattern{
+					stat:    "prop",
+					bases:   bases,
+					inverse: true,
+				})
+			}
+			for _, bases := range vcs {
+				c.patterns = append(c.patterns, pattern{
+					stat:    "count",
+					bases:   bases,
+					inverse: true,
 				})
 			}
 		default:
@@ -247,8 +291,9 @@ certain, use, e.g. -p GCgc
 					bases: "Nn",
 				},
 				{
-					stat:  "prop",
-					bases: "-",
+					stat:         "prop",
+					bases:        "-",
+					headerPrefix: "gap",
 				},
 			}
 		}
@@ -264,6 +309,7 @@ certain, use, e.g. -p GCgc
 var atCmd = &cobra.Command{
 	Use:                   "at <infile[s]>",
 	Short:                 "AT content",
+	Long:                  `AT[+at] nucleotide content`,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
 		files, err = resolveCommandLine(files)
@@ -274,23 +320,24 @@ var atCmd = &cobra.Command{
 		if c {
 			stat = "count"
 		}
-		p := content{
+		ctn := content{
 			inputs:            files,
 			perFile:           f,
 			writeDescriptions: d,
 			writeFileNames:    fn,
 			patterns: []pattern{
 				{
-					stat:  stat,
-					bases: "ATat",
+					stat:    stat,
+					bases:   "ATat",
+					inverse: v,
 				},
 			},
 		}
-		err = p.writeHeader(out)
+		err = ctn.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(out)
+		err = ctn.writeBody(out)
 		return err
 	},
 }
@@ -298,6 +345,7 @@ var atCmd = &cobra.Command{
 var gcCmd = &cobra.Command{
 	Use:                   "gc <infile[s]>",
 	Short:                 "GC content",
+	Long:                  `GC[+gc] nucleotide content`,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
 		files, err = resolveCommandLine(files)
@@ -308,23 +356,24 @@ var gcCmd = &cobra.Command{
 		if c {
 			stat = "count"
 		}
-		p := content{
+		ctn := content{
 			inputs:            files,
 			perFile:           f,
 			writeDescriptions: d,
 			writeFileNames:    fn,
 			patterns: []pattern{
 				{
-					stat:  stat,
-					bases: "GCgc",
+					stat:    stat,
+					bases:   "GCgc",
+					inverse: v,
 				},
 			},
 		}
-		err = p.writeHeader(out)
+		err = ctn.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(out)
+		err = ctn.writeBody(out)
 		return err
 	},
 }
@@ -332,6 +381,7 @@ var gcCmd = &cobra.Command{
 var atgcCmd = &cobra.Command{
 	Use:                   "atgc <infile[s]>",
 	Short:                 "ATGC content",
+	Long:                  `ATGC[+atgc] nucleotide content`,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
 		files, err = resolveCommandLine(files)
@@ -342,23 +392,24 @@ var atgcCmd = &cobra.Command{
 		if c {
 			stat = "count"
 		}
-		p := content{
+		ctn := content{
 			inputs:            files,
 			perFile:           f,
 			writeDescriptions: d,
 			writeFileNames:    fn,
 			patterns: []pattern{
 				{
-					stat:  stat,
-					bases: "ATGCatgc",
+					stat:    stat,
+					bases:   "ATGCatgc",
+					inverse: v,
 				},
 			},
 		}
-		err = p.writeHeader(out)
+		err = ctn.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(out)
+		err = ctn.writeBody(out)
 		return err
 	},
 }
@@ -366,6 +417,7 @@ var atgcCmd = &cobra.Command{
 var nCmd = &cobra.Command{
 	Use:                   "n <infile[s]>",
 	Short:                 "N content",
+	Long:                  `N[+n] content`,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
 		files, err = resolveCommandLine(files)
@@ -376,23 +428,24 @@ var nCmd = &cobra.Command{
 		if c {
 			stat = "count"
 		}
-		p := content{
+		ctn := content{
 			inputs:            files,
 			perFile:           f,
 			writeDescriptions: d,
 			writeFileNames:    fn,
 			patterns: []pattern{
 				{
-					stat:  stat,
-					bases: "Nn",
+					stat:    stat,
+					bases:   "Nn",
+					inverse: v,
 				},
 			},
 		}
-		err = p.writeHeader(out)
+		err = ctn.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(out)
+		err = ctn.writeBody(out)
 		return err
 	},
 }
@@ -400,6 +453,8 @@ var nCmd = &cobra.Command{
 var gapCmd = &cobra.Command{
 	Use:                   "gaps <infile[s]>",
 	Short:                 "Gap content",
+	Long:                  `Gap ("-") content`,
+	Aliases:               []string{"gaps"},
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
 		files, err = resolveCommandLine(files)
@@ -410,23 +465,62 @@ var gapCmd = &cobra.Command{
 		if c {
 			stat = "count"
 		}
-		p := content{
+		ctn := content{
 			inputs:            files,
 			perFile:           f,
 			writeDescriptions: d,
 			writeFileNames:    fn,
 			patterns: []pattern{
 				{
-					stat:  stat,
-					bases: "-",
+					stat:         stat,
+					bases:        "-",
+					headerPrefix: "gap",
+					inverse:      v,
 				},
 			},
 		}
-		err = p.writeHeader(out)
+		err = ctn.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(out)
+		err = ctn.writeBody(out)
+		return err
+	},
+}
+
+var ambigCmd = &cobra.Command{
+	Use:                   "ambig <infile[s]>",
+	Short:                 "Ambiguous content",
+	Long:                  `Ambiguous ("RYMKSWHBVDNrymkswhbvdn") nucleotide content`,
+	DisableFlagsInUseLine: true,
+	RunE: func(cmd *cobra.Command, files []string) (err error) {
+		files, err = resolveCommandLine(files)
+		if err != nil {
+			return err
+		}
+		stat := "prop"
+		if c {
+			stat = "count"
+		}
+		ctn := content{
+			inputs:            files,
+			perFile:           f,
+			writeDescriptions: d,
+			writeFileNames:    fn,
+			patterns: []pattern{
+				{
+					stat:         stat,
+					bases:        "RYMKSWHBVDNrymkswhbvdn",
+					headerPrefix: "ambig",
+					inverse:      v,
+				},
+			},
+		}
+		err = ctn.writeHeader(out)
+		if err != nil {
+			return err
+		}
+		err = ctn.writeBody(out)
 		return err
 	},
 }
@@ -434,6 +528,7 @@ var gapCmd = &cobra.Command{
 var softCmd = &cobra.Command{
 	Use:                   "soft <infile[s]>",
 	Short:                 "Softmasked content",
+	Long:                  `Softmasked ("atgcrymkswhbvdn") nucleotide content`,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
 		files, err = resolveCommandLine(files)
@@ -444,23 +539,25 @@ var softCmd = &cobra.Command{
 		if c {
 			stat = "count"
 		}
-		p := content{
+		ctn := content{
 			inputs:            files,
 			perFile:           f,
 			writeDescriptions: d,
 			writeFileNames:    fn,
 			patterns: []pattern{
 				{
-					stat:  stat,
-					bases: "atgcn",
+					stat:         stat,
+					bases:        "atgcrymkswhbvdn",
+					headerPrefix: "soft",
+					inverse:      v,
 				},
 			},
 		}
-		err = p.writeHeader(out)
+		err = ctn.writeHeader(out)
 		if err != nil {
 			return err
 		}
-		err = p.writeBody(out)
+		err = ctn.writeBody(out)
 		return err
 	},
 }
