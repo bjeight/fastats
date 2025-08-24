@@ -57,7 +57,7 @@ Pre.softmasked.fasta	0.535700
 ```
 
 ```
-❯ bgzip -d -c GRCh38.primary_assembly.genome.bgz | fastats gc | grep "Y"
+❯ bgzip -d -c GRCh38.primary_assembly.genome.fa.bgz | fastats gc | grep "Y"
 chrY	0.184749
 ```
 
