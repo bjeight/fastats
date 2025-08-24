@@ -82,6 +82,7 @@ Usage:
   fastats [command]
 
 Available Commands:
+  ambig       Ambiguous content
   assembly    Assembly statistics
   at          AT content
   atgc        ATGC content
