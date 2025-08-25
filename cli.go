@@ -13,7 +13,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.10.0",
+		Version:           "0.10.1",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -50,6 +50,26 @@ var (
 	out io.Writer = os.Stdout
 )
 
+func getFileBoolVarPArgs() (*bool, string, string, bool, string) {
+	return &f, "file", "f", false, "calculate statistics per file (default is per record)"
+}
+
+func getDescriptionBoolVarPArgs() (*bool, string, string, bool, string) {
+	return &d, "description", "d", false, "print record descriptions (default is IDs)"
+}
+
+func getFileNameBoolVarArgs() (*bool, string, bool, string) {
+	return &fn, "fn", false, "always print a filename column"
+}
+
+func getCountBoolVarPArgs() (*bool, string, string, bool, string) {
+	return &c, "count", "c", false, "print base content counts (default is proportions)"
+}
+
+func getInverseBoolVarPArgs() (*bool, string, string, bool, string) {
+	return &v, "inverse", "v", false, "count bases that are NOT the given content"
+}
+
 func init() {
 
 	rootCmd.AddCommand(contentCmd)
@@ -69,19 +89,19 @@ func init() {
 	contentCmd.Flags().StringSliceVarP(&ps, "prop", "p", make([]string, 0), "comma-separated list of arbitrary base contents to get proportions of (case-sensitive)")
 	contentCmd.Flags().StringSliceVar(&vcs, "vc", make([]string, 0), "comma-separated list of inverse arbitrary base contents to count (case-sensitive)")
 	contentCmd.Flags().StringSliceVar(&vps, "vp", make([]string, 0), "comma-separated list of inverse arbitrary base content get proportions of (case-sensitive)")
-	contentCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	contentCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	contentCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	contentCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	contentCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
+	contentCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	contentCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	contentCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	contentCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	contentCmd.Flags().SortFlags = false
 
-	atCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
-	atCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	atCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
-	atCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	atCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	atCmd.Flags().BoolVarP(getCountBoolVarPArgs())
+	atCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	atCmd.Flags().BoolVarP(getInverseBoolVarPArgs())
+	atCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
+	atCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	atCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	atCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	atCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
@@ -89,11 +109,11 @@ func init() {
 	atCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	atCmd.Flags().SortFlags = false
 
-	gcCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
-	gcCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	gcCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
-	gcCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	gcCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	gcCmd.Flags().BoolVarP(getCountBoolVarPArgs())
+	gcCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	gcCmd.Flags().BoolVarP(getInverseBoolVarPArgs())
+	gcCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
+	gcCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	gcCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	gcCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	gcCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
@@ -101,11 +121,11 @@ func init() {
 	gcCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	gcCmd.Flags().SortFlags = false
 
-	atgcCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
-	atgcCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	atgcCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
-	atgcCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	atgcCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	atgcCmd.Flags().BoolVarP(getCountBoolVarPArgs())
+	atgcCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	atgcCmd.Flags().BoolVarP(getInverseBoolVarPArgs())
+	atgcCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
+	atgcCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	atgcCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	atgcCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	atgcCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
@@ -113,11 +133,11 @@ func init() {
 	atgcCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	atgcCmd.Flags().SortFlags = false
 
-	softCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
-	softCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	softCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
-	softCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	softCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	softCmd.Flags().BoolVarP(getCountBoolVarPArgs())
+	softCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	softCmd.Flags().BoolVarP(getInverseBoolVarPArgs())
+	softCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
+	softCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	softCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	softCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	softCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
@@ -125,11 +145,11 @@ func init() {
 	softCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	softCmd.Flags().SortFlags = false
 
-	nCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
-	nCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	nCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
-	nCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	nCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	nCmd.Flags().BoolVarP(getCountBoolVarPArgs())
+	nCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	nCmd.Flags().BoolVarP(getInverseBoolVarPArgs())
+	nCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
+	nCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	nCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	nCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	nCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
@@ -137,11 +157,11 @@ func init() {
 	nCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	nCmd.Flags().SortFlags = false
 
-	gapCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
-	gapCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	gapCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
-	gapCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	gapCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	gapCmd.Flags().BoolVarP(getCountBoolVarPArgs())
+	gapCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	gapCmd.Flags().BoolVarP(getInverseBoolVarPArgs())
+	gapCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
+	gapCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	gapCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	gapCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	gapCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
@@ -149,11 +169,11 @@ func init() {
 	gapCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	gapCmd.Flags().SortFlags = false
 
-	ambigCmd.Flags().BoolVarP(&c, "count", "c", false, "print base content counts (default is proportions)")
-	ambigCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	ambigCmd.Flags().BoolVarP(&v, "inverse", "v", false, "count bases that are NOT the given content")
-	ambigCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
-	ambigCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	ambigCmd.Flags().BoolVarP(getCountBoolVarPArgs())
+	ambigCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	ambigCmd.Flags().BoolVarP(getInverseBoolVarPArgs())
+	ambigCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
+	ambigCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	ambigCmd.Flags().Lookup("count").NoOptDefVal = "true"
 	ambigCmd.Flags().Lookup("file").NoOptDefVal = "true"
 	ambigCmd.Flags().Lookup("inverse").NoOptDefVal = "true"
@@ -161,18 +181,19 @@ func init() {
 	ambigCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	ambigCmd.Flags().SortFlags = false
 
-	lenCmd.Flags().BoolVarP(&f, "file", "f", false, "calculate statistics per file (default is per record)")
-	lenCmd.Flags().BoolVar(&fn, "fn", false, "always print a filename column")
+	lenCmd.Flags().BoolVarP(getFileBoolVarPArgs())
+	lenCmd.Flags().BoolVar(getFileNameBoolVarArgs())
 	lenCmd.Flags().BoolVar(&kb, "kb", false, "print sequence lengths in kilobases")
 	lenCmd.Flags().BoolVar(&mb, "mb", false, "print sequence lengths in megabases")
 	lenCmd.Flags().BoolVar(&gb, "gb", false, "print sequence lengths in gigabases")
 	lenCmd.Flags().Lookup("file").NoOptDefVal = "true"
+	lenCmd.Flags().Lookup("fn").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("kb").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("mb").NoOptDefVal = "true"
 	lenCmd.Flags().Lookup("gb").NoOptDefVal = "true"
 	lenCmd.Flags().SortFlags = false
 
-	nameCmd.Flags().BoolVarP(&d, "description", "d", false, "print record descriptions (default is IDs)")
+	nameCmd.Flags().BoolVarP(getDescriptionBoolVarPArgs())
 	nameCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	nameCmd.Flags().SortFlags = false
 
