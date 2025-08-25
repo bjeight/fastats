@@ -46,7 +46,7 @@ Pf3D7_MIT_v3	0.684096
 
 ```
 ❯ fastats soft -f *softmasked.fasta
-file	atgcn_prop
+file	soft_prop
 Pad.softmasked.fasta	0.612057
 Pbi.softmasked.fasta	0.545409
 Pbl.softmasked.fasta	0.576649
@@ -75,13 +75,13 @@ GRCh38.primary_assembly.genome.fa	145138636	80373285	9	19
 ### Help
 
 ```
-❯ fastats -h
 Very simple statistics from fasta files
 
 Usage:
   fastats [command]
 
 Available Commands:
+  ambig       Ambiguous content
   assembly    Assembly statistics
   at          AT content
   atgc        ATGC content
