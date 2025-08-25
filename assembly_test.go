@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	"github.com/bjeight/fastats/fasta"
@@ -37,17 +36,16 @@ func TestAssemblyWriteHeader1(t *testing.T) {
 			},
 		},
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tN50\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tN50\n"
 
-	err := a.writeHeader(out)
+	err := a.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -60,17 +58,16 @@ func TestAssemblyWriteHeader2(t *testing.T) {
 			},
 		},
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tN90\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tN90\n"
 
-	err := a.writeHeader(out)
+	err := a.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -83,17 +80,16 @@ func TestAssemblyWriteHeader3(t *testing.T) {
 			},
 		},
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tN10\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tN10\n"
 
-	err := a.writeHeader(out)
+	err := a.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -106,17 +102,16 @@ func TestN50WriteHeader4(t *testing.T) {
 			},
 		},
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tNG50\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tNG50\n"
 
-	err := a.writeHeader(out)
+	err := a.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -129,17 +124,16 @@ func TestAssemblyWriteHeader5(t *testing.T) {
 			},
 		},
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tNG90\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tNG90\n"
 
-	err := a.writeHeader(out)
+	err := a.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -160,17 +154,16 @@ func TestAssemblyWriteHeader6(t *testing.T) {
 			},
 		},
 	}
-	out := bytes.NewBuffer(make([]byte, 0))
-	desiredResult := "file\tN50\tL50\tNG50\n"
+	output := bytes.NewBuffer(make([]byte, 0))
+	expected := "file\tN50\tL50\tNG50\n"
 
-	err := a.writeHeader(out)
+	err := a.writeHeader(output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -185,18 +178,17 @@ func TestAssemblyWriteBody1(t *testing.T) {
 		},
 	}
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	8
+	expected := `stdin	8
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := assemblyRecords("stdin", reader, a, out)
+	err := assemblyRecords("stdin", reader, a, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -211,18 +203,17 @@ func TestAssemblyWriteBody2(t *testing.T) {
 		},
 	}
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	4
+	expected := `stdin	4
 ` // len -f fastaFile = 54, so n90 = 48.6 bases, 10 + 9 + 8 + 7 + 6 + 5 + 4 = 49, so n90 = 4
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := assemblyRecords("stdin", reader, a, out)
+	err := assemblyRecords("stdin", reader, a, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -238,18 +229,17 @@ func TestN50WriteBody3(t *testing.T) {
 		genomeSize: 54,
 	}
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	8
+	expected := `stdin	8
 `
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := assemblyRecords("stdin", reader, a, out)
+	err := assemblyRecords("stdin", reader, a, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -265,18 +255,17 @@ func TestN50WriteBody4(t *testing.T) {
 		genomeSize: 80,
 	}
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	6
+	expected := `stdin	6
 ` // len -f fastaFile = 54, so n50 = 40 bases, 10 + 9 + 8 + 7 + 6 = 40, so n50 = 6
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := assemblyRecords("stdin", reader, a, out)
+	err := assemblyRecords("stdin", reader, a, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }
 
@@ -300,17 +289,16 @@ func TestN50WriteBody5(t *testing.T) {
 		genomeSize: 54,
 	}
 	reader := fasta.NewReader(bytes.NewReader(fastaFile))
-	desiredResult := `stdin	8	3	8
+	expected := `stdin	8	3	8
 ` // len -f fastaFile = 54, so n50 = 40 bases, 10 + 9 + 8 + 7 + 6 = 40, so n50 = 6
-	out := bytes.NewBuffer(make([]byte, 0))
+	output := bytes.NewBuffer(make([]byte, 0))
 
-	err := assemblyRecords("stdin", reader, a, out)
+	err := assemblyRecords("stdin", reader, a, output)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if out.String() != desiredResult {
-		fmt.Print(out.String())
-		t.Fail()
+	if output.String() != expected {
+		t.Errorf("expected:\n %s, got:\n %s", expected, output)
 	}
 }

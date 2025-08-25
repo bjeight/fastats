@@ -57,7 +57,7 @@ Pre.softmasked.fasta	0.535700
 ```
 
 ```
-❯ bgzip -d -c GRCh38.primary_assembly.genome.bgz | fastats gc | grep "Y"
+❯ bgzip -d -c GRCh38.primary_assembly.genome.fa.bgz | fastats gc | grep "Y"
 chrY	0.184749
 ```
 
@@ -75,7 +75,6 @@ GRCh38.primary_assembly.genome.fa	145138636	80373285	9	19
 ### Help
 
 ```
-❯ fastats -h
 Very simple statistics from fasta files
 
 Usage:
