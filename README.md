@@ -75,6 +75,8 @@ GRCh38.primary_assembly.genome.fa	145138636	80373285	9	19
 ### Help
 
 ```
+❯ fastats -h
+
 Very simple statistics from fasta files
 
 Usage:
