@@ -68,13 +68,15 @@ chrX	0.392343
 
 ```
 ❯ fastats assembly GRCh38.primary_assembly.genome.fa
-file  N50 N90 L50 L90
-GRCh38.primary_assembly.genome.fa	145138636	80373285	9	19
+file	n_records	length	N50	N90	L50	L90
+GRCh38.primary_assembly.genome.fa	194	3099750718	145138636	80373285	9	19
 ```
 
 ### Help
 
 ```
+❯ fastats -h
+
 Very simple statistics from fasta files
 
 Usage:

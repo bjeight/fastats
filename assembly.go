@@ -21,17 +21,25 @@ type assemblyStatistic struct {
 	sValue int    // the value of the statistic to calculate (50, 90, etc.)
 }
 
-func (stat assemblyStatistic) string() string {
+func (stat assemblyStatistic) string(lenFormat string) string {
 	return stat.sType + strconv.Itoa(stat.sValue)
+
 }
 
 func (args assembly) writeHeader(w io.Writer) error {
-	_, err := w.Write([]byte("file"))
+	_, err := w.Write([]byte("file\tn_records\tlength"))
 	if err != nil {
 		return err
 	}
+	switch args.lenFormat {
+	case "kb", "mb", "gb":
+		_, err := w.Write([]byte("_" + args.lenFormat))
+		if err != nil {
+			return err
+		}
+	}
 	for _, stat := range args.stats {
-		_, err := w.Write([]byte("\t" + stat.string()))
+		_, err := w.Write([]byte("\t" + stat.string(args.lenFormat)))
 		if err != nil {
 			return err
 		}
@@ -68,6 +76,7 @@ func (args assembly) writeBody(w io.Writer) error {
 func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writer) error {
 	contigLengths := make([]int, 0)
 	totalLength := 0
+	nRecords := 0
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
@@ -79,10 +88,11 @@ func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writ
 		l := len(record.Seq)
 		contigLengths = append(contigLengths, l)
 		totalLength += l
+		nRecords++
 	}
 	slices.Sort(contigLengths)
 
-	_, err := w.Write([]byte(returnFileName(inputPath)))
+	_, err := w.Write([]byte(returnFileName(inputPath) + "\t" + strconv.Itoa(nRecords) + "\t" + returnLengthFormatted(totalLength, args.lenFormat)))
 	if err != nil {
 		return err
 	}

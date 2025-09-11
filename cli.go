@@ -13,7 +13,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.10.1",
+		Version:           "0.11.0",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -197,9 +197,9 @@ func init() {
 	nameCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	nameCmd.Flags().SortFlags = false
 
-	assemblyCmd.Flags().IntSliceVarP(&nX, "N", "N", make([]int, 0), "arbitrary NX assembly statistics")
-	assemblyCmd.Flags().IntSliceVarP(&lX, "L", "L", make([]int, 0), "arbitrary LX assembly statistics")
-	assemblyCmd.Flags().IntSliceVarP(&ngX, "NG", "G", make([]int, 0), "arbitrary NGX assembly statistics (requires -g)")
+	assemblyCmd.Flags().IntSliceVarP(&nX, "N", "N", make([]int, 0), "comma-separated list of arbitrary NX assembly statistics to calculate")
+	assemblyCmd.Flags().IntSliceVarP(&lX, "L", "L", make([]int, 0), "comma-separated list of arbitrary LX assembly statistics to calculate")
+	assemblyCmd.Flags().IntSliceVarP(&ngX, "NG", "G", make([]int, 0), "comma-separated list of arbitrary NGX assembly statistics to calculate (requires -g)")
 	assemblyCmd.Flags().IntVarP(&gS, "genomesize", "g", -1, "genome size in bases")
 	assemblyCmd.MarkFlagsRequiredTogether("NG", "genomesize")
 	assemblyCmd.Flags().BoolVar(&kb, "kb", false, "print N and NG stats in kilobases")
@@ -664,9 +664,11 @@ var assemblyCmd = &cobra.Command{
 
 Default stats when no arguments provided are: N50, N90, L50, L90
 
-Use any combination of the --N, --L, --NG (-g) flags to override the defaults, e.g.:
+Use any combination of the --N, --L, --NG (+ -g) flags to override the defaults, e.g.:
 
-fastats assembly --N50 --N90 --NG50 --NG90 -g 3000000000 <infile[s]>
+fastats assembly --N 50 --N 90 --NG 50 --NG 90 -g 3000000000 <infile[s]>
+fastats assembly --N=50,90 --NG=50,90 -g 3000000000 <infile[s]>
+fastats assembly -N50,90 -G50,90 -g 3000000000 <infile[s]>
 `,
 	DisableFlagsInUseLine: true,
 	RunE: func(cmd *cobra.Command, files []string) (err error) {
