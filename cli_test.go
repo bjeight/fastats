@@ -586,8 +586,8 @@ func TestAssemblyCmd1(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	N50	N90	L50	L90
-asmbly.fasta	8	4	3	7
+	expected := `file	n_records	length	N50	N90	L50	L90
+asmbly.fasta	9	54	8	4	3	7
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -602,8 +602,8 @@ func TestAssemblyCmd2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	N50
-asmbly.fasta	8
+	expected := `file	n_records	length	N50
+asmbly.fasta	9	54	8
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -618,8 +618,8 @@ func TestAssemblyCmd3(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	N50_kb
-asmbly.fasta	0.008
+	expected := `file	n_records	length_kb	N50_kb
+asmbly.fasta	9	0.054	0.008
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -634,8 +634,8 @@ func TestAssemblyCmd4(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	N50_mb
-asmbly.fasta	0.000008
+	expected := `file	n_records	length_mb	N50_mb
+asmbly.fasta	9	0.000054	0.000008
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -650,8 +650,8 @@ func TestAssemblyCmd5(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	N50_gb
-asmbly.fasta	0.000000008
+	expected := `file	n_records	length_gb	N50_gb
+asmbly.fasta	9	0.000000054	0.000000008
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -675,9 +675,9 @@ func TestAssemblyCmd7(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	N50
-asmbly.fasta	8
-asmbly.fasta	8
+	expected := `file	n_records	length	N50
+asmbly.fasta	9	54	8
+asmbly.fasta	9	54	8
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -692,8 +692,8 @@ func TestAssemblyCmd8(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	N50	N90
-asmbly.fasta	8	4
+	expected := `file	n_records	length	N50	N90
+asmbly.fasta	9	54	8	4
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -708,8 +708,8 @@ func TestAssemblyCmd9(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	N50	NG50
-asmbly.fasta	8	8
+	expected := `file	n_records	length	N50	NG50
+asmbly.fasta	9	54	8	8
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
@@ -724,8 +724,8 @@ func TestAssemblyCmd10(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `file	NG50
-asmbly.fasta	6
+	expected := `file	n_records	length	NG50
+asmbly.fasta	9	54	6
 `
 	if output != expected {
 		t.Errorf("expected:\n %s, got:\n %s", expected, output)
