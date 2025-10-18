@@ -29,7 +29,7 @@ AAAAAAAAA
 `)
 
 func TestAssemblyNStat1(t *testing.T) {
-	contigLengths := []int{6, 7, 10, 3, 4, 5, 8, 2, 9}
+	contigLengths := []int64{6, 7, 10, 3, 4, 5, 8, 2, 9}
 	slices.Sort(contigLengths)
 	NX := nStat(contigLengths, 54, 50)
 	if NX != 8 {
@@ -38,7 +38,7 @@ func TestAssemblyNStat1(t *testing.T) {
 }
 
 func TestAssemblyNStat2(t *testing.T) {
-	contigLengths := []int{6, 7, 10, 3, 4, 5, 8, 2, 9}
+	contigLengths := []int64{6, 7, 10, 3, 4, 5, 8, 2, 9}
 	slices.Sort(contigLengths)
 	NX := nStat(contigLengths, 54, 90)
 	if NX != 4 {
@@ -47,7 +47,7 @@ func TestAssemblyNStat2(t *testing.T) {
 }
 
 func TestAssemblyNStat3(t *testing.T) {
-	contigLengths := []int{6, 7, 10, 3, 4, 5, 8, 2, 9}
+	contigLengths := []int64{6, 7, 10, 3, 4, 5, 8, 2, 9}
 	slices.Sort(contigLengths)
 	NGX := nStat(contigLengths, 80, 50)
 	if NGX != 6 {
@@ -56,7 +56,7 @@ func TestAssemblyNStat3(t *testing.T) {
 }
 
 func TestAssemblyLStat1(t *testing.T) {
-	contigLengths := []int{6, 7, 10, 3, 4, 5, 8, 2, 9}
+	contigLengths := []int64{6, 7, 10, 3, 4, 5, 8, 2, 9}
 	slices.Sort(contigLengths)
 	LX := lStat(contigLengths, 54, 50)
 	if LX != 3 {

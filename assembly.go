@@ -12,17 +12,17 @@ import (
 type assembly struct {
 	inputs     []string            // input files
 	stats      []assemblyStatistic //
-	genomeSize int                 //genome size to use when calculating NG-statistics
+	genomeSize int64               //genome size to use when calculating NG-statistics
 	lenFormat  string
 }
 
 type assemblyStatistic struct {
 	sType  string // the type of statistic to calculate: {N, NG, L}
-	sValue int    // the value of the statistic to calculate (50, 90, etc.)
+	sValue int64  // the value of the statistic to calculate (50, 90, etc.)
 }
 
 func (stat assemblyStatistic) string(lenFormat string) string {
-	return stat.sType + strconv.Itoa(stat.sValue)
+	return stat.sType + strconv.FormatInt(stat.sValue, 10)
 
 }
 
@@ -74,9 +74,9 @@ func (args assembly) writeBody(w io.Writer) error {
 }
 
 func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writer) error {
-	contigLengths := make([]int, 0)
-	totalLength := 0
-	nRecords := 0
+	contigLengths := make([]int64, 0)
+	var totalLength int64 = 0
+	var nRecords int64 = 0
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
@@ -85,14 +85,14 @@ func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writ
 		if err != nil {
 			return err
 		}
-		l := len(record.Seq)
+		l := int64(len(record.Seq))
 		contigLengths = append(contigLengths, l)
 		totalLength += l
 		nRecords++
 	}
 	slices.Sort(contigLengths)
 
-	_, err := w.Write([]byte(returnFileName(inputPath) + "\t" + strconv.Itoa(nRecords) + "\t" + returnLengthFormatted(totalLength, args.lenFormat)))
+	_, err := w.Write([]byte(returnFileName(inputPath) + "\t" + strconv.FormatInt(nRecords, 10) + "\t" + returnLengthFormatted(totalLength, args.lenFormat)))
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writ
 			}
 		case "L":
 			lX := lStat(contigLengths, totalLength, stat.sValue)
-			_, err := w.Write([]byte("\t" + strconv.Itoa(lX)))
+			_, err := w.Write([]byte("\t" + strconv.FormatInt(lX, 10)))
 			if err != nil {
 				return err
 			}
@@ -130,9 +130,9 @@ func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writ
 }
 
 // contigLengths must be sorted in ascending order
-func nStat(contigLengths []int, genomeSize int, statValue int) int {
-	var nX int
-	runningTotal := 0
+func nStat(contigLengths []int64, genomeSize int64, statValue int64) int64 {
+	var nX int64
+	var runningTotal int64 = 0
 	for i := len(contigLengths) - 1; i >= 0; i-- {
 		runningTotal += contigLengths[i]
 		if float64(runningTotal) >= float64(genomeSize)*(float64(statValue)/100.0) {
@@ -144,13 +144,13 @@ func nStat(contigLengths []int, genomeSize int, statValue int) int {
 }
 
 // contigLengths must be sorted in ascending order
-func lStat(contigLengths []int, genomeSize int, statValue int) int {
-	var lX int
-	runningTotal := 0
+func lStat(contigLengths []int64, genomeSize int64, statValue int64) int64 {
+	var lX int64
+	var runningTotal int64 = 0
 	for i := len(contigLengths) - 1; i >= 0; i-- {
 		runningTotal += contigLengths[i]
 		if float64(runningTotal) >= float64(genomeSize)*(float64(statValue)/100.0) {
-			lX = len(contigLengths) - i
+			lX = int64(len(contigLengths) - i)
 			break
 		}
 	}
