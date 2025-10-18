@@ -48,7 +48,7 @@ func returnRecordName(record fasta.Record, description bool) string {
 }
 
 // returnRecordLength (potentially) converts bases to kb, mb, gb.
-func returnLengthFormatted(l int, unit string) string {
+func returnLengthFormatted(l int64, unit string) string {
 	var s string
 	switch unit {
 	case "kb":
@@ -58,7 +58,7 @@ func returnLengthFormatted(l int, unit string) string {
 	case "gb":
 		s = strconv.FormatFloat(float64(l)/float64(1000000000), 'f', 9, 64)
 	default:
-		s = strconv.Itoa(l)
+		s = strconv.FormatInt(l, 10)
 	}
 	return s
 }

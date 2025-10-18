@@ -67,7 +67,7 @@ func (args length) writeBody(w io.Writer) error {
 func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) error {
 
 	// initiate a count for the length of each record
-	l_total := 0
+	var l_total int64 = 0
 
 	// iterate over every record in the fasta file
 	for {
@@ -81,7 +81,7 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) 
 		// if the statistic is to be calculated per file, add this record's length
 		// to the total, else just write it.
 		if args.perFile {
-			l_total += len(record.Seq)
+			l_total += int64(len(record.Seq))
 		} else {
 			if args.writeFileNames {
 				_, err = w.Write([]byte(returnFileName(inputPath) + "\t"))
@@ -89,7 +89,7 @@ func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) 
 					return err
 				}
 			}
-			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.writeDescriptions), returnLengthFormatted(len(record.Seq), args.lenFormat))
+			s := fmt.Sprintf("%s\t%s\n", returnRecordName(record, args.writeDescriptions), returnLengthFormatted(int64(len(record.Seq)), args.lenFormat))
 			_, err = w.Write([]byte(s))
 			if err != nil {
 				return err

@@ -13,7 +13,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.11.0",
+		Version:           "0.11.1",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 )
@@ -42,10 +42,10 @@ var (
 	mb bool
 	gb bool
 
-	nX  []int
-	ngX []int
-	lX  []int
-	gS  int
+	nX  []int64
+	ngX []int64
+	lX  []int64
+	gS  int64
 
 	out io.Writer = os.Stdout
 )
@@ -197,10 +197,10 @@ func init() {
 	nameCmd.Flags().Lookup("description").NoOptDefVal = "true"
 	nameCmd.Flags().SortFlags = false
 
-	assemblyCmd.Flags().IntSliceVarP(&nX, "N", "N", make([]int, 0), "comma-separated list of arbitrary NX assembly statistics to calculate")
-	assemblyCmd.Flags().IntSliceVarP(&lX, "L", "L", make([]int, 0), "comma-separated list of arbitrary LX assembly statistics to calculate")
-	assemblyCmd.Flags().IntSliceVarP(&ngX, "NG", "G", make([]int, 0), "comma-separated list of arbitrary NGX assembly statistics to calculate (requires -g)")
-	assemblyCmd.Flags().IntVarP(&gS, "genomesize", "g", -1, "genome size in bases")
+	assemblyCmd.Flags().Int64SliceVarP(&nX, "N", "N", make([]int64, 0), "comma-separated list of arbitrary NX assembly statistics to calculate")
+	assemblyCmd.Flags().Int64SliceVarP(&lX, "L", "L", make([]int64, 0), "comma-separated list of arbitrary LX assembly statistics to calculate")
+	assemblyCmd.Flags().Int64SliceVarP(&ngX, "NG", "G", make([]int64, 0), "comma-separated list of arbitrary NGX assembly statistics to calculate (requires -g)")
+	assemblyCmd.Flags().Int64VarP(&gS, "genomesize", "g", -1, "genome size in bases")
 	assemblyCmd.MarkFlagsRequiredTogether("NG", "genomesize")
 	assemblyCmd.Flags().BoolVar(&kb, "kb", false, "print N and NG stats in kilobases")
 	assemblyCmd.Flags().BoolVar(&mb, "mb", false, "print N and NG stats in megabases")

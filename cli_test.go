@@ -55,9 +55,9 @@ func resetFlags() {
 	mb = false
 	gb = false
 
-	nX = make([]int, 0)
-	ngX = make([]int, 0)
-	lX = make([]int, 0)
+	nX = make([]int64, 0)
+	ngX = make([]int64, 0)
+	lX = make([]int64, 0)
 	gS = 0
 }
 

@@ -87,10 +87,10 @@ func (args content) writeBody(w io.Writer) error {
 func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer) error {
 
 	// initiate a count for the total length of the file
-	l_total := 0
+	var l_total int64 = 0
 
 	// initiate counts for each pattern
-	n_totals := make([]int, len(args.patterns))
+	n_totals := make([]int64, len(args.patterns))
 	for i := range args.patterns {
 		n_totals[i] = 0
 	}
@@ -104,9 +104,9 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 		if err != nil {
 			return err
 		}
-		l_total += len(record.Seq)
+		l_total += int64(len(record.Seq))
 		// initiate a table of counts
-		var lookup [256]int
+		var lookup [256]int64
 		// for every nucleotide in the sequence, +1 its cell in the lookup table
 		for _, nuc := range record.Seq {
 			lookup[nuc] += 1
@@ -126,12 +126,12 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 
 		// iterate over all the patterns to be counted
 		for i, p := range args.patterns {
-			n := 0
+			var n int64 = 0
 			for _, b := range []byte(p.bases) {
 				n += lookup[b]
 			}
 			if p.inverse {
-				n = len(record.Seq) - n
+				n = int64(len(record.Seq)) - n
 			}
 
 			// if the statistic is to be calculated per file, add this record's content count
@@ -142,7 +142,7 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 				// print a count or a proportion
 				switch p.stat {
 				case "count":
-					_, err = w.Write([]byte("\t" + strconv.Itoa(n)))
+					_, err = w.Write([]byte("\t" + strconv.FormatInt(n, 10)))
 					if err != nil {
 						return err
 					}
@@ -173,7 +173,7 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 		for i, p := range args.patterns {
 			switch p.stat {
 			case "count":
-				_, err := w.Write([]byte("\t" + strconv.Itoa(n_totals[i])))
+				_, err := w.Write([]byte("\t" + strconv.FormatInt(n_totals[i], 10)))
 				if err != nil {
 					return err
 				}
