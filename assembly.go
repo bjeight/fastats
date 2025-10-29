@@ -21,7 +21,7 @@ type assemblyStatistic struct {
 	sValue int64  // the value of the statistic to calculate (50, 90, etc.)
 }
 
-func (stat assemblyStatistic) string(lenFormat string) string {
+func (stat assemblyStatistic) string() string {
 	return stat.sType + strconv.FormatInt(stat.sValue, 10)
 
 }
@@ -39,7 +39,7 @@ func (args assembly) writeHeader(w io.Writer) error {
 		}
 	}
 	for _, stat := range args.stats {
-		_, err := w.Write([]byte("\t" + stat.string(args.lenFormat)))
+		_, err := w.Write([]byte("\t" + stat.string()))
 		if err != nil {
 			return err
 		}
