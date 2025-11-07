@@ -3,9 +3,10 @@ package fasta
 import (
 	"bufio"
 	"bytes"
-	"compress/gzip"
 	"errors"
 	"io"
+
+	"github.com/biogo/hts/bgzf"
 )
 
 // A struct for one fasta record
@@ -28,7 +29,7 @@ func NewReader(f io.Reader) *Reader {
 }
 
 func NewZReader(f io.Reader) *Reader {
-	rz, _ := gzip.NewReader(f)
+	rz, _ := bgzf.NewReader(f, 0)
 	return &Reader{bufio.NewReader(rz)}
 }
 

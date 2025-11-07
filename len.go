@@ -63,7 +63,6 @@ func (args length) writeBody(w io.Writer) error {
 	return nil
 }
 
-// lengthRecords does the work of fastats len for one fasta file at a time.
 func lengthRecords(inputPath string, r *fasta.Reader, args length, w io.Writer) error {
 
 	// initiate a count for the length of each record

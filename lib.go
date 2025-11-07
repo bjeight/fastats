@@ -33,13 +33,11 @@ func getReaderFile(inputPath string) (*fasta.Reader, *os.File, error) {
 	return r, f, nil
 }
 
-// Get just the filename from path + filename or just return the full path
 func returnFileName(filepath string) string {
 	sa := strings.Split(filepath, "/")
 	return sa[len(sa)-1]
 }
 
-// Return either fasta record ID or its (full) description
 func returnRecordName(record fasta.Record, description bool) string {
 	if description {
 		return record.Description
@@ -47,7 +45,6 @@ func returnRecordName(record fasta.Record, description bool) string {
 	return record.ID
 }
 
-// returnRecordLength (potentially) converts bases to kb, mb, gb.
 func returnLengthFormatted(l int64, unit string) string {
 	var s string
 	switch unit {

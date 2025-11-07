@@ -37,7 +37,6 @@ func (args names) writeBody(w io.Writer) error {
 	return nil
 }
 
-// namesRecords does the work of fastats names for one fasta file at a time.
 func namesRecords(inputPath string, r *fasta.Reader, args names, w io.Writer) error {
 
 	// iterate over every record in the fasta file
