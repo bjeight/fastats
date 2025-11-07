@@ -31,7 +31,6 @@ func (args num) writeBody(w io.Writer) error {
 	return nil
 }
 
-// numRecords does the work of fastats num for one fasta file at a time.
 func numRecords(inputPath string, r *fasta.Reader, args num, w io.Writer) error {
 	// initiate a count for the number of records
 	var c_total int64 = 0
