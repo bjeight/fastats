@@ -80,6 +80,7 @@ GRCh38.primary_assembly.genome.fa	194	3099750718	145138636	80373285	9	19
 Very simple statistics from fasta files
 
 Usage:
+  fastats {command} [flags]
   fastats [command]
 
 Available Commands:
@@ -98,8 +99,9 @@ Available Commands:
   soft        Softmasked content
 
 Flags:
-  -h, --help      help for fastats
-  -v, --version   version for fastats
+  -h, --help       help for fastats
+  -l, --licences   print licence information and exit
+  -v, --version    version for fastats
 
 Use "fastats [command] --help" for more information about a command.
 ```
