@@ -22,15 +22,23 @@ func (args names) writeHeader(w io.Writer) error {
 
 func (args names) writeBody(w io.Writer) error {
 	for _, input := range args.inputs {
-		reader, file, err := getReaderFile(input)
+		err := writeBodyLineNames(w, input, args)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		err = namesRecords(input, reader, args, w)
-		if err != nil {
-			return err
-		}
+	}
+	return nil
+}
+
+func writeBodyLineNames(w io.Writer, input string, args names) error {
+	reader, file, err := getReaderFile(input)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	err = namesRecords(input, reader, args, w)
+	if err != nil {
+		return err
 	}
 	return nil
 }

@@ -34,7 +34,7 @@ AT
 		BaseCounts:  bc,
 	}
 
-	record, err := r.Read()
+	record, err := r.ReadCalcBaseCounts()
 	if err != nil {
 		t.Error(err)
 	}
@@ -53,7 +53,7 @@ AT
 		Len:         20,
 		BaseCounts:  bc,
 	}
-	record, err = r.Read()
+	record, err = r.ReadCalcBaseCounts()
 	if err != nil {
 		t.Error(err)
 	}
@@ -72,7 +72,7 @@ AT
 		Len:         2,
 		BaseCounts:  bc,
 	}
-	record, err = r.Read()
+	record, err = r.ReadCalcBaseCounts()
 	if err != nil {
 		t.Error(err)
 	}
@@ -82,7 +82,7 @@ AT
 	}
 
 	expected = Record{}
-	record, err = r.Read()
+	record, err = r.ReadCalcBaseCounts()
 	if !errors.Is(err, io.EOF) {
 		t.Error(err)
 	}

@@ -33,9 +33,18 @@ func NewZReader(f io.Reader) *Reader {
 	return &Reader{bufio.NewReader(rz)}
 }
 
-// Read reads one fasta record's info from the underlying reader. The final record is returned with error = nil,
-// and the next call to Read() returns an empty Record struct and error = io.EOF.
 func (r *Reader) Read() (Record, error) {
+	return r.read(false)
+}
+
+func (r *Reader) ReadCalcBaseCounts() (Record, error) {
+	return r.read(true)
+}
+
+// read reads one fasta record's info from the underlying reader. The final record is returned with error = nil,
+// and the next call to read() returns an empty Record struct and error = io.EOF.
+// Base content is optionally counted
+func (r *Reader) read(calcBaseCounts bool) (Record, error) {
 
 	var (
 		line, peek []byte
@@ -120,8 +129,10 @@ func (r *Reader) Read() (Record, error) {
 				line = line[:len(line)-drop]
 			}
 
-			for _, b := range line {
-				bases[b]++
+			if calcBaseCounts {
+				for _, b := range line {
+					bases[b]++
+				}
 			}
 			seqLength += int64(len(line))
 		}
