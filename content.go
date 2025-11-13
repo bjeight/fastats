@@ -4,8 +4,6 @@ import (
 	"errors"
 	"io"
 	"strconv"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 type content struct {
@@ -84,16 +82,13 @@ func (args content) writeBody(w io.Writer) error {
 	return nil
 }
 
-func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer) error {
+func contentRecords(inputPath string, r *Reader, args content, w io.Writer) error {
 
 	// initiate a count for the total length of the file
 	var l_total int64 = 0
 
 	// initiate counts for each pattern
 	n_totals := make([]int64, len(args.patterns))
-	for i := range args.patterns {
-		n_totals[i] = 0
-	}
 
 	// iterate over every record in the fasta file
 	for {
@@ -104,13 +99,8 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 		if err != nil {
 			return err
 		}
-		l_total += int64(len(record.Seq))
-		// initiate a table of counts
-		var lookup [256]int64
-		// for every nucleotide in the sequence, +1 its cell in the lookup table
-		for _, nuc := range record.Seq {
-			lookup[nuc] += 1
-		}
+		l_total += record.Len
+
 		if args.writeFileNames && !args.perFile {
 			_, err = w.Write([]byte(returnFileName(inputPath) + "\t"))
 			if err != nil {
@@ -128,10 +118,10 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 		for i, p := range args.patterns {
 			var n int64 = 0
 			for _, b := range []byte(p.bases) {
-				n += lookup[b]
+				n += record.BaseCounts[b]
 			}
 			if p.inverse {
-				n = int64(len(record.Seq)) - n
+				n = record.Len - n
 			}
 
 			// if the statistic is to be calculated per file, add this record's content count
@@ -147,7 +137,7 @@ func contentRecords(inputPath string, r *fasta.Reader, args content, w io.Writer
 						return err
 					}
 				case "prop":
-					proportion := float64(n) / float64(len(record.Seq))
+					proportion := float64(n) / float64(record.Len)
 					_, err = w.Write([]byte("\t" + strconv.FormatFloat(proportion, 'f', 6, 64)))
 					if err != nil {
 						return err

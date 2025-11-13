@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"testing"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 func TestContentWriteHeader1(t *testing.T) {
@@ -217,7 +215,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 
 	expected := `Seq1	0.666667
 Seq2	0.833333
@@ -251,7 +249,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `Seq1	0.333333
 Seq2	0.000000
 `
@@ -284,7 +282,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	0.750000
 `
 	output := bytes.NewBuffer(make([]byte, 0))
@@ -316,7 +314,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `Seq1	4
 Seq2	5
 `
@@ -349,7 +347,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	9
 `
 	output := bytes.NewBuffer(make([]byte, 0))
@@ -380,7 +378,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `my.fasta	Seq1	4
 my.fasta	Seq2	5
 `
@@ -413,7 +411,7 @@ ATGATG
 >Seq2 Danio_rerio
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `Seq1 Homo_sapiens	4
 Seq2 Danio_rerio	5
 `
@@ -445,7 +443,7 @@ ATGATG
 >Seq2 Danio_rerio
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `my.fasta	Seq1 Homo_sapiens	6
 my.fasta	Seq2 Danio_rerio	5
 `
@@ -486,7 +484,7 @@ ATGATG
 >Seq2 Danio_rerio
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `Seq1	1.000000	0.333333	2
 Seq2	0.833333	0.000000	0
 `
@@ -518,7 +516,7 @@ ATGATG
 >Seq2 Danio_rerio
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `my.fasta	11
 `
 	output := bytes.NewBuffer(make([]byte, 0))

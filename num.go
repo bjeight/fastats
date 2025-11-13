@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 type num struct {
@@ -31,7 +29,7 @@ func (args num) writeBody(w io.Writer) error {
 	return nil
 }
 
-func numRecords(inputPath string, r *fasta.Reader, args num, w io.Writer) error {
+func numRecords(inputPath string, r *Reader, args num, w io.Writer) error {
 	// initiate a count for the number of records
 	var c_total int64 = 0
 

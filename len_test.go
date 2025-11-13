@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"testing"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 func TestLengthWriteHeader1(t *testing.T) {
@@ -139,7 +137,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `Seq1	6
 Seq2	6
 `
@@ -167,7 +165,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	12
 `
 	output := bytes.NewBuffer(make([]byte, 0))
@@ -194,7 +192,7 @@ ATGATG
 >Seq2 Danio_rerio
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `Seq1 Homo_sapiens	6
 Seq2 Danio_rerio	6
 `
@@ -222,7 +220,7 @@ ATGATG
 >Seq2 Danio_rerio
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `test.fa	Seq1 Homo_sapiens	6
 test.fa	Seq2 Danio_rerio	6
 `

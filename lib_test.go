@@ -2,8 +2,6 @@ package main
 
 import (
 	"testing"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 func TestReturnFileName(t *testing.T) {
@@ -15,7 +13,7 @@ func TestReturnFileName(t *testing.T) {
 }
 
 func TestReturnRecordName(t *testing.T) {
-	record := fasta.Record{
+	record := Record{
 		ID:          "seq1",
 		Description: "seq1 Homo_sapiens",
 	}

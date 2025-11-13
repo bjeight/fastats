@@ -1,4 +1,4 @@
-package fasta
+package main
 
 import (
 	"bufio"
@@ -9,11 +9,11 @@ import (
 	"github.com/biogo/hts/bgzf"
 )
 
-// A struct for one fasta record
 type Record struct {
 	ID          string
 	Description string
-	Seq         []byte
+	Len         int64
+	BaseCounts  [256]int64
 }
 
 var (
@@ -33,15 +33,17 @@ func NewZReader(f io.Reader) *Reader {
 	return &Reader{bufio.NewReader(rz)}
 }
 
-// Read reads one fasta record from the underlying reader. The final record is returned with error = nil,
-// and the next call to Read() returns an empty FastaRecord struct and error = io.EOF.
+// Read reads one fasta record's info from the underlying reader. The final record is returned with error = nil,
+// and the next call to Read() returns an empty Record struct and error = io.EOF.
 func (r *Reader) Read() (Record, error) {
 
 	var (
-		buffer, line, peek []byte
-		fields             [][]byte
-		err                error
-		record             Record
+		line, peek []byte
+		fields     [][]byte
+		record     Record
+		bases      [256]int64
+		seqLength  int64
+		err        error
 	)
 
 	first := true
@@ -109,7 +111,7 @@ func (r *Reader) Read() (Record, error) {
 			}
 
 			drop := 0
-			// Strip unix or dos newline characters from the sequence before appending it.
+			// Strip unix or dos newline characters from the sequence before processing it.
 			if line[len(line)-1] == '\n' {
 				drop = 1
 				if len(line) > 1 && line[len(line)-2] == '\r' {
@@ -118,10 +120,15 @@ func (r *Reader) Read() (Record, error) {
 				line = line[:len(line)-drop]
 			}
 
-			buffer = append(buffer, line...)
+			for _, b := range line {
+				bases[b]++
+			}
+			seqLength += int64(len(line))
 		}
 	}
-	record.Seq = buffer
+
+	record.Len = seqLength
+	record.BaseCounts = bases
 
 	return record, err
 }

@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"testing"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 func TestNamesWriteHeader1(t *testing.T) {
@@ -50,7 +48,7 @@ ATGATG
 >Seq2 Danio_rerio Y
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `file.fasta	Seq1
 file.fasta	Seq2
 `
@@ -75,7 +73,7 @@ ATGATG
 >Seq2 Danio_rerio Y
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `file.fasta	Seq1 Homo_sapiens X
 file.fasta	Seq2 Danio_rerio Y
 `

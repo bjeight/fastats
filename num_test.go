@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"testing"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 func TestNumWriteHeader(t *testing.T) {
@@ -29,7 +27,7 @@ ATGATG
 >Seq2
 ATTAT-
 `)
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	2
 `
 	output := bytes.NewBuffer(make([]byte, 0))

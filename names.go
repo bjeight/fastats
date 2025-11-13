@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 type names struct {
@@ -37,7 +35,7 @@ func (args names) writeBody(w io.Writer) error {
 	return nil
 }
 
-func namesRecords(inputPath string, r *fasta.Reader, args names, w io.Writer) error {
+func namesRecords(inputPath string, r *Reader, args names, w io.Writer) error {
 
 	// iterate over every record in the fasta file
 	for {
