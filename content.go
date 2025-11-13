@@ -69,15 +69,23 @@ func (args content) writeHeader(w io.Writer) error {
 
 func (args content) writeBody(w io.Writer) error {
 	for _, input := range args.inputs {
-		reader, file, err := getReaderFile(input)
+		err := writeBodyLineContent(w, input, args)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		err = contentRecords(input, reader, args, w)
-		if err != nil {
-			return err
-		}
+	}
+	return nil
+}
+
+func writeBodyLineContent(w io.Writer, input string, args content) error {
+	reader, file, err := getReaderFile(input)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	err = contentRecords(input, reader, args, w)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -92,7 +100,7 @@ func contentRecords(inputPath string, r *Reader, args content, w io.Writer) erro
 
 	// iterate over every record in the fasta file
 	for {
-		record, err := r.Read()
+		record, err := r.ReadCalcBaseCounts()
 		if err == io.EOF {
 			break
 		}

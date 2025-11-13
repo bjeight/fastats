@@ -16,15 +16,23 @@ func (args num) writeHeader(w io.Writer) error {
 
 func (args num) writeBody(w io.Writer) error {
 	for _, input := range args.inputs {
-		reader, file, err := getReaderFile(input)
+		err := writeBodyLineNum(w, input, args)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		err = numRecords(input, reader, args, w)
-		if err != nil {
-			return err
-		}
+	}
+	return nil
+}
+
+func writeBodyLineNum(w io.Writer, input string, args num) error {
+	reader, file, err := getReaderFile(input)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	err = numRecords(input, reader, args, w)
+	if err != nil {
+		return err
 	}
 	return nil
 }

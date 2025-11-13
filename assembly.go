@@ -58,15 +58,23 @@ func (args assembly) writeHeader(w io.Writer) error {
 
 func (args assembly) writeBody(w io.Writer) error {
 	for _, input := range args.inputs {
-		reader, file, err := getReaderFile(input)
+		err := writeBodyLineAssembly(w, input, args)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		err = assemblyRecords(input, reader, args, w)
-		if err != nil {
-			return err
-		}
+	}
+	return nil
+}
+
+func writeBodyLineAssembly(w io.Writer, input string, args assembly) error {
+	reader, file, err := getReaderFile(input)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	err = assemblyRecords(input, reader, args, w)
+	if err != nil {
+		return err
 	}
 	return nil
 }
