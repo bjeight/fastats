@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"slices"
 	"testing"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 var fastaFile = []byte(`>s5
@@ -283,7 +281,7 @@ func TestAssemblyWriteBody1(t *testing.T) {
 			},
 		},
 	}
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	9	54	8
 `
 	output := bytes.NewBuffer(make([]byte, 0))
@@ -308,7 +306,7 @@ func TestAssemblyWriteBody2(t *testing.T) {
 			},
 		},
 	}
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	9	54	4
 ` // len -f fastaFile = 54, so n90 = 48.6 bases, 10 + 9 + 8 + 7 + 6 + 5 + 4 = 49, so N90 = 4
 	output := bytes.NewBuffer(make([]byte, 0))
@@ -334,7 +332,7 @@ func TestN50WriteBody3(t *testing.T) {
 		},
 		genomeSize: 54,
 	}
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	9	54	8
 `
 	output := bytes.NewBuffer(make([]byte, 0))
@@ -360,7 +358,7 @@ func TestN50WriteBody4(t *testing.T) {
 		},
 		genomeSize: 80,
 	}
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	9	54	6
 `
 	// genome size = 80 bases, so N50 = 40 bases, 10 + 9 + 8 + 7 + 6 = 40, so N50 = 6
@@ -395,7 +393,7 @@ func TestN50WriteBody5(t *testing.T) {
 		},
 		genomeSize: 54,
 	}
-	reader := fasta.NewReader(bytes.NewReader(fastaFile))
+	reader := NewReader(bytes.NewReader(fastaFile))
 	expected := `stdin	9	54	8	3	8
 `
 	// len -f fastaFile = 54, so n50 = 27 bases, 10 + 9 + 8 = 27, so N50 = 8, and L50 = 3

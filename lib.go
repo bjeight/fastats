@@ -5,17 +5,15 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
-func getReaderFile(inputPath string) (*fasta.Reader, *os.File, error) {
+func getReaderFile(inputPath string) (*Reader, *os.File, error) {
 	// open stdin or a file
-	var r *fasta.Reader
+	var r *Reader
 	var f *os.File
 	if inputPath == "stdin" {
 		f := os.Stdin
-		r = fasta.NewReader(f)
+		r = NewReader(f)
 	} else {
 		f, err := os.Open(inputPath)
 		if err != nil {
@@ -24,9 +22,9 @@ func getReaderFile(inputPath string) (*fasta.Reader, *os.File, error) {
 		// depending on whether the fasta file is compressed or not, provide the correct reader
 		switch filepath.Ext(inputPath) {
 		case ".gz", ".bgz":
-			r = fasta.NewZReader(f)
+			r = NewZReader(f)
 		default:
-			r = fasta.NewReader(f)
+			r = NewReader(f)
 		}
 	}
 
@@ -38,7 +36,7 @@ func returnFileName(filepath string) string {
 	return sa[len(sa)-1]
 }
 
-func returnRecordName(record fasta.Record, description bool) string {
+func returnRecordName(record Record, description bool) string {
 	if description {
 		return record.Description
 	}

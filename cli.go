@@ -13,7 +13,7 @@ var (
 		Use:               "fastats {command}",
 		Short:             "Very simple statistics from fasta files",
 		Long:              ``,
-		Version:           "0.12.0",
+		Version:           "0.13.0",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 		Run: func(cmd *cobra.Command, args []string) {
 			if licences {

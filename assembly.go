@@ -5,8 +5,6 @@ import (
 	"io"
 	"slices"
 	"strconv"
-
-	"github.com/bjeight/fastats/fasta"
 )
 
 type assembly struct {
@@ -73,7 +71,7 @@ func (args assembly) writeBody(w io.Writer) error {
 	return nil
 }
 
-func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writer) error {
+func assemblyRecords(inputPath string, r *Reader, args assembly, w io.Writer) error {
 	contigLengths := make([]int64, 0)
 	var totalLength int64 = 0
 	var nRecords int64 = 0
@@ -85,7 +83,7 @@ func assemblyRecords(inputPath string, r *fasta.Reader, args assembly, w io.Writ
 		if err != nil {
 			return err
 		}
-		l := int64(len(record.Seq))
+		l := record.Len
 		contigLengths = append(contigLengths, l)
 		totalLength += l
 		nRecords++

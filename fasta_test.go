@@ -1,4 +1,4 @@
-package fasta
+package main
 
 import (
 	"bytes"
@@ -23,11 +23,17 @@ AT
 	fastaR := bytes.NewReader(fastaData)
 	r := NewReader(fastaR)
 
+	bc := [256]int64{}
+	for _, b := range "ATGC" {
+		bc[b]++
+	}
 	expected := Record{
 		ID:          "seq1",
 		Description: "seq1",
-		Seq:         []byte("ATGC"),
+		Len:         4,
+		BaseCounts:  bc,
 	}
+
 	record, err := r.Read()
 	if err != nil {
 		t.Error(err)
@@ -37,10 +43,15 @@ AT
 		t.Errorf("problem in TestRead(seq1)")
 	}
 
+	bc = [256]int64{}
+	for _, b := range "ATG-ATG-ATGCATGCATGC" {
+		bc[b]++
+	}
 	expected = Record{
 		ID:          "seq2",
 		Description: "seq2 something",
-		Seq:         []byte("ATG-ATG-ATGCATGCATGC"),
+		Len:         20,
+		BaseCounts:  bc,
 	}
 	record, err = r.Read()
 	if err != nil {
@@ -51,10 +62,15 @@ AT
 		t.Errorf("problem in TestRead(seq2)")
 	}
 
+	bc = [256]int64{}
+	for _, b := range "AT" {
+		bc[b]++
+	}
 	expected = Record{
 		ID:          "seq3",
 		Description: "seq3",
-		Seq:         []byte("AT"),
+		Len:         2,
+		BaseCounts:  bc,
 	}
 	record, err = r.Read()
 	if err != nil {
